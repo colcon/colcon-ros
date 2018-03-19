@@ -55,6 +55,7 @@ class RosTask(TaskExtensionPoint):
             additional_hooks += [
                 'share/{pkg.name}/local_setup.bash'.format_map(locals()),
                 'share/{pkg.name}/local_setup.bat'.format_map(locals()),
+                'share/{pkg.name}/local_setup.ps1'.format_map(locals()),
                 'share/{pkg.name}/local_setup.sh'.format_map(locals()),
             ]
             if args.symlink_install:
