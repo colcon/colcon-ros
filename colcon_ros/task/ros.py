@@ -30,14 +30,20 @@ class RosTask(TaskExtensionPoint):
             '--ament-cmake-args',
             nargs='*', metavar='*', type=str.lstrip,
             help="Arbitrary arguments which are passed to all 'ament_cmake' "
-            'packages (args which start with a dash must be prefixed with an '
-            'escaped space `\ `, e.g.: `--ament-cmake-args \ -Dvar=val`)')
+            'packages. Args that start with "-" must be prefixed with a '
+            'space. If using bash then use'
+            '\n\t--ament-cmake-args \ -Dvar=val\n'
+            'If using Windows cmd then use'
+            '\n\t--ament-cmake-args " -Dvar=val"\n')
         parser.add_argument(
             '--catkin-cmake-args',
             nargs='*', metavar='*', type=str.lstrip,
             help="Arbitrary arguments which are passed to all 'catkin' "
-            'packages (args which start with a dash must be prefixed with an '
-            'escaped space `\ `, e.g.: `--catkin-cmake-args \ -Dvar=val`)')
+            'packages. Args that start with "-" must be prefixed with a '
+            'space. If using bash then use'
+            '\n\t--catkin-cmake-args \ -Dvar=val\n'
+            'If using Windows cmd then use'
+            '\n\t--catkin-cmake-args " -Dvar=val"\n')
 
     async def build(self):  # noqa: D102
         args = self.context.args
