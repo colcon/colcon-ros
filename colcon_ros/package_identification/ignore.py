@@ -3,7 +3,7 @@
 
 from colcon_core.package_identification \
     import PackageIdentificationExtensionPoint
-from colcon_core.package_identification import SkipLocationException
+from colcon_core.package_identification import IgnoreLocationException
 from colcon_core.plugin_system import satisfies_version
 
 
@@ -34,4 +34,4 @@ class IgnorePackageIdentification(PackageIdentificationExtensionPoint):
         for filename in filenames:
             ignore = desc.path / filename
             if ignore.exists():
-                raise SkipLocationException()
+                raise IgnoreLocationException()

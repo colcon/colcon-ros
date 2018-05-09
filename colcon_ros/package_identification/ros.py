@@ -7,7 +7,7 @@ from colcon_core.package_augmentation import PackageAugmentationExtensionPoint
 from colcon_core.package_identification import logger
 from colcon_core.package_identification \
     import PackageIdentificationExtensionPoint
-from colcon_core.package_identification import SkipLocationException
+from colcon_core.package_identification import IgnoreLocationException
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.plugin_system import SkipExtensionException
 from colcon_python_setup_py.package_identification.python_setup_py \
@@ -48,9 +48,9 @@ class RosPackageIdentification(
 
         # skip paths with an ignore marker file
         if (desc.path / 'CATKIN_IGNORE').exists():
-            raise SkipLocationException()
+            raise IgnoreLocationException()
         if (desc.path / 'AMENT_IGNORE').exists():
-            raise SkipLocationException()
+            raise IgnoreLocationException()
 
         # parse package manifest and get build type
         pkg, build_type = get_package_with_build_type(str(desc.path))
