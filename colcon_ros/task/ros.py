@@ -119,6 +119,12 @@ class RosTask(TaskExtensionPoint):
                             'PYTHONPATH', str(rel_python_path), mode='prepend')
             create_environment_scripts(
                 self.context.pkg, args, additional_hooks=additional_hooks)
+
+            # ensure that the install base has the marker file
+            # identifying it as a catkin workspace
+            marker = Path(args.install_base) / '.catkin'
+            marker.touch(exist_ok=True)
+
             return rc
 
     async def test(self):  # noqa: D102
