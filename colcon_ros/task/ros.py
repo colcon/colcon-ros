@@ -1,10 +1,12 @@
 # Copyright 2016-2018 Dirk Thomas
 # Licensed under the Apache License, Version 2.0
 
+import os
 from pathlib import Path
 
 from colcon_cmake.task.cmake.build import CmakeBuildTask
 from colcon_cmake.task.cmake.test import CmakeTestTask
+from colcon_core.environment import create_environment_scripts
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.shell import create_environment_hook
@@ -83,28 +85,11 @@ class RosTask(TaskExtensionPoint):
 
         elif build_type == 'catkin':
             extension = CmakeBuildTask()
+            if args.cmake_args is None:
+                args.cmake_args = []
+            args.cmake_args += ['-DCATKIN_BUILD_BINARY_PACKAGE=1']
             if args.catkin_cmake_args:
-                if args.cmake_args is None:
-                    args.cmake_args = []
                 args.cmake_args += args.catkin_cmake_args
-            # create hooks to (un)set CATKIN_SETUP_UTIL_ARGS environment
-            # variable to mimic passing --extend along in plain shells
-            create_file(
-                args, 'share/{pkg.name}/hook/set_catkin_setup_util_args.sh'
-                .format_map(locals()),
-                content='CATKIN_SETUP_UTIL_ARGS=--extend')
-            create_file(
-                args, 'share/{pkg.name}/hook/unset_catkin_setup_util_args.sh'
-                .format_map(locals()),
-                content='unset CATKIN_SETUP_UTIL_ARGS')
-            additional_hooks = [
-                ['setup.bash', '--extend'],
-                ['setup.bat'],
-                ['share/{pkg.name}/hook/set_catkin_setup_util_args.sh'
-                 .format_map(locals())],
-                ['setup.sh', "# --extend doesn't work in a plain shell"],
-                ['share/{pkg.name}/hook/unset_catkin_setup_util_args.sh'
-                 .format_map(locals())]]
 
         elif build_type == 'cmake':
             extension = CmakeBuildTask()
@@ -113,7 +98,34 @@ class RosTask(TaskExtensionPoint):
             assert False, 'Unknown build type: ' + build_type
 
         extension.set_context(context=self.context)
-        return await extension.build(additional_hooks=additional_hooks)
+        if build_type != 'catkin':
+            return await extension.build(additional_hooks=additional_hooks)
+        else:
+            # for catkin packages add additional hooks after the package has
+            # been built and installed depending on the installed files
+            rc = await extension.build(skip_hook_creation=True)
+
+            # add Python 2 specific path to PYTHONPATH if it exists
+            if os.environ.get('ROS_PYTHON_VERSION', '2') == '2':
+                for subdirectory in ('dist-packages', 'site-packages'):
+                    python_path = Path(args.install_base) / \
+                        'lib' / 'python2.7' / subdirectory
+                    logger.log(1, "checking '%s'" % python_path)
+                    if python_path.exists():
+                        rel_python_path = python_path.relative_to(
+                            args.install_base)
+                        additional_hooks += create_environment_hook(
+                            'python2path', Path(args.install_base), pkg.name,
+                            'PYTHONPATH', str(rel_python_path), mode='prepend')
+            create_environment_scripts(
+                self.context.pkg, args, additional_hooks=additional_hooks)
+
+            # ensure that the install base has the marker file
+            # identifying it as a catkin workspace
+            marker = Path(args.install_base) / '.catkin'
+            marker.touch(exist_ok=True)
+
+            return rc
 
     async def test(self):  # noqa: D102
         args = self.context.args
