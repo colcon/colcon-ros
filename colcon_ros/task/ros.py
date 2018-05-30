@@ -87,7 +87,7 @@ class RosTask(TaskExtensionPoint):
             extension = CmakeBuildTask()
             if args.cmake_args is None:
                 args.cmake_args = []
-            args.cmake_args += ['-DCATKIN_BUILD_BINARY_PACKAGE=1']
+            args.cmake_args += ['-DCATKIN_INSTALL_INTO_PREFIX_ROOT=0']
             if args.catkin_cmake_args:
                 args.cmake_args += args.catkin_cmake_args
 
