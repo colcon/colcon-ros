@@ -1,0 +1,23 @@
+Description: Remove dependencies on catkin_pkg to avoid conflict with ROS 1
+ While the package is available from Debian this Debian package only
+ depends on python3-catkin-pkg-modules to avoid the collision with the
+ Python 2 version of the package.
+ Otherwise being listed as a install_requires but not being installed
+ would result in a runtime error by pkg_resources.
+Author: Dirk Thomas <web@dirk-thomas.net>
+
+--- setup.cfg	2018-05-29 20:30:40.000000000 -0700
++++ setup.cfg.patched	2018-05-29 20:30:40.000000000 -0700
+@@ -26,7 +26,11 @@
+ 
+ [options]
+ install_requires = 
+-	catkin_pkg
++	# to avoid conflicts with ROS 1 this Debian package only depends on
++	# python3-catkin-pkg-modules and not python3-catkin-pkg
++	# listing it here but not installing it in the Debian package
++	# would result in a runtime error by pkg_resources
++	# catkin_pkg
+ 	colcon-cmake>=0.2.0
+ 	colcon-core>=0.2.0
+ 	colcon-python-setup-py
