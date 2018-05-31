@@ -31,15 +31,15 @@ class RosTask(TaskExtensionPoint):
         parser.add_argument(
             '--ament-cmake-args',
             nargs='*', metavar='*', type=str.lstrip,
-            help="Pass arguments to all 'ament_cmake' packages. Every arg "
-            'starting with a dash must be prefixed by a space,\n'
-            'e.g. --ament-cmake-args " -Dvar=val"')
+            help="Pass arguments to 'ament_cmake' packages. "
+            'Arguments matching other options must be prefixed by a space,\n'
+            'e.g. --ament-cmake-args " --help"')
         parser.add_argument(
             '--catkin-cmake-args',
             nargs='*', metavar='*', type=str.lstrip,
-            help="Pass arguments to all 'catkin' packages. Every arg starting "
-            'with a dash must be prefixed by a space,\n'
-            'e.g. --catkin-cmake-args " -Dvar=val"')
+            help="Pass arguments to 'catkin' packages. "
+            'Arguments matching other options must be prefixed by a space,\n'
+            'e.g. --catkin-cmake-args " --help"')
 
     async def build(self):  # noqa: D102
         args = self.context.args
