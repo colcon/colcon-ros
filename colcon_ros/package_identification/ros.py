@@ -55,6 +55,10 @@ class RosPackageIdentification(
         # parse package manifest and get build type
         pkg, build_type = get_package_with_build_type(str(desc.path))
         if not pkg or not build_type:
+            # if it is not a wet ROS package check for a dry ROS package
+            if (desc.path / 'manifest.xml').exists():
+                # ignore location to avoid being identified as a CMake package
+                raise IgnoreLocationException()
             return
 
         desc.type = 'ros'
