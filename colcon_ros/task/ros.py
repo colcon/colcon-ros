@@ -90,6 +90,9 @@ class RosTask(TaskExtensionPoint):
             args.cmake_args += ['-DCATKIN_INSTALL_INTO_PREFIX_ROOT=0']
             if args.catkin_cmake_args:
                 args.cmake_args += args.catkin_cmake_args
+            additional_hooks += create_environment_hook(
+                'ros_package_path', Path(args.install_base), pkg.name,
+                'ROS_PACKAGE_PATH', 'share', mode='prepend')
 
         elif build_type == 'cmake':
             extension = CmakeBuildTask()
