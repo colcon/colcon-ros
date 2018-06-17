@@ -60,6 +60,13 @@ class RosTask(TaskExtensionPoint):
                 'share/{pkg.name}/local_setup.ps1'.format_map(locals()),
                 'share/{pkg.name}/local_setup.sh'.format_map(locals()),
             ]
+            if args.test_result_base:
+                if args.cmake_args is None:
+                    args.cmake_args = []
+                # ament_cmake appends the project name itself
+                args.cmake_args.append(
+                    '-DAMENT_TEST_RESULTS_DIR=' +
+                    os.path.dirname(args.test_result_base))
             if args.symlink_install:
                 if args.cmake_args is None:
                     args.cmake_args = []
@@ -88,6 +95,11 @@ class RosTask(TaskExtensionPoint):
             if args.cmake_args is None:
                 args.cmake_args = []
             args.cmake_args += ['-DCATKIN_INSTALL_INTO_PREFIX_ROOT=0']
+            if args.test_result_base:
+                # catkin appends the project name itself
+                args.cmake_args.append(
+                    '-DCATKIN_TEST_RESULTS_DIR=' +
+                    os.path.dirname(args.test_result_base))
             if args.catkin_cmake_args:
                 args.cmake_args += args.catkin_cmake_args
             additional_hooks += create_environment_hook(
