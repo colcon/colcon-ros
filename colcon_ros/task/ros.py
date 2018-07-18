@@ -75,35 +75,7 @@ class RosTask(TaskExtensionPoint):
                 if args.cmake_args is None:
                     args.cmake_args = []
                 args.cmake_args += args.ament_cmake_args
-            # extend CMAKE_PREFIX_PATH with AMENT_PREFIX_PATH
-            ament_prefix_path = os.environ.get('AMENT_PREFIX_PATH')
-            if ament_prefix_path:
-                ament_prefix_path = ament_prefix_path.replace(
-                    os.pathsep, ';')
-                if args.cmake_args is None:
-                    args.cmake_args = []
-                # check if the CMAKE_PREFIX_PATH is explicitly set
-                prefix = '-DCMAKE_PREFIX_PATH='
-                for i, value in reversed(list(enumerate(args.cmake_args))):
-                    if not value.startswith(prefix):
-                        continue
-                    # extend the last existing entry
-                    existing = value[len(prefix):]
-                    if existing:
-                        existing = ';' + existing
-                    args.cmake_args[i] = \
-                        '-DCMAKE_PREFIX_PATH={ament_prefix_path}{existing}' \
-                        .format_map(locals())
-                    break
-                else:
-                    # otherwise extend the environment variable
-                    existing = os.environ.get('CMAKE_PREFIX_PATH', '')
-                    if existing:
-                        existing = ';' + existing.replace(
-                            os.pathsep, ';')
-                    args.cmake_args.append(
-                        '-DCMAKE_PREFIX_PATH={ament_prefix_path}{existing}'
-                        .format_map(locals()))
+            self._extend_cpp_with_app(args)
 
         elif build_type == 'ament_python':
             extension = PythonBuildTask()
@@ -137,6 +109,7 @@ class RosTask(TaskExtensionPoint):
 
         elif build_type == 'cmake':
             extension = CmakeBuildTask()
+            self._extend_cpp_with_app(args)
 
         else:
             assert False, 'Unknown build type: ' + build_type
@@ -170,6 +143,37 @@ class RosTask(TaskExtensionPoint):
             marker.touch(exist_ok=True)
 
             return rc
+
+    def _extend_cpp_with_app(self, args):
+        """Extend CMAKE_PREFIX_PATH with AMENT_PREFIX_PATH."""
+        ament_prefix_path = os.environ.get('AMENT_PREFIX_PATH')
+        if ament_prefix_path:
+            ament_prefix_path = ament_prefix_path.replace(
+                os.pathsep, ';')
+            if args.cmake_args is None:
+                args.cmake_args = []
+            # check if the CMAKE_PREFIX_PATH is explicitly set
+            prefix = '-DCMAKE_PREFIX_PATH='
+            for i, value in reversed(list(enumerate(args.cmake_args))):
+                if not value.startswith(prefix):
+                    continue
+                # extend the last existing entry
+                existing = value[len(prefix):]
+                if existing:
+                    existing = ';' + existing
+                args.cmake_args[i] = \
+                    '-DCMAKE_PREFIX_PATH={ament_prefix_path}{existing}' \
+                    .format_map(locals())
+                break
+            else:
+                # otherwise extend the environment variable
+                existing = os.environ.get('CMAKE_PREFIX_PATH', '')
+                if existing:
+                    existing = ';' + existing.replace(
+                        os.pathsep, ';')
+                args.cmake_args.append(
+                    '-DCMAKE_PREFIX_PATH={ament_prefix_path}{existing}'
+                    .format_map(locals()))
 
     async def test(self):  # noqa: D102
         args = self.context.args
