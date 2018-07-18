@@ -42,7 +42,6 @@ class RosPackageIdentification(
                 'therefore ROS packages can not be identified')
 
     def identify(self, desc):  # noqa: D102
-
         # ignore packages which have been identified with a different type
         if desc.type is not None and desc.type != 'ros':
             return
