@@ -160,7 +160,7 @@ def _get_build_type(pkg):
         return None
 
     supported_build_types = (
-        'ament_cmake', 'ament_python', 'catkin', 'cmake', 'cargo')
+        'ament_cmake', 'ament_python', 'cargo', 'catkin', 'cmake')
 
     if build_type not in supported_build_types:
         path = os.path.dirname(pkg.filename)

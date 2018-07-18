@@ -13,9 +13,10 @@ from colcon_core.shell import create_environment_hook
 from colcon_core.task import create_file
 from colcon_core.task import install
 from colcon_core.task import TaskExtensionPoint
+from colcon_cargo.task.cargo.build import CargoBuildTask
+from colcon_cargo.task.cargo.test import CargoTestTask
 from colcon_core.task.python.build import PythonBuildTask
 from colcon_core.task.python.test import PythonTestTask
-from colcon_cargo.task.cargo.build import CargoBuildTask
 from colcon_ros.package_identification.ros import get_package_with_build_type
 
 logger = colcon_logger.getChild(__name__)
@@ -200,6 +201,8 @@ class RosTask(TaskExtensionPoint):
             extension = CmakeTestTask()
         elif build_type == 'ament_python':
             extension = PythonTestTask()
+        elif build_type == 'cargo':
+            extension = CargoTestTask()
         else:
             assert False, 'Unknown build type: ' + build_type
 
