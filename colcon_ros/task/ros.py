@@ -15,6 +15,8 @@ from colcon_core.task import install
 from colcon_core.task import TaskExtensionPoint
 from colcon_core.task.python.build import PythonBuildTask
 from colcon_core.task.python.test import PythonTestTask
+from colcon_gradle.task.gradle.build import GradleBuildTask
+from colcon_gradle.task.gradle.test import GradleTestTask
 from colcon_ros.package_identification.ros import get_package_with_build_type
 
 logger = colcon_logger.getChild(__name__)
@@ -111,6 +113,9 @@ class RosTask(TaskExtensionPoint):
             extension = CmakeBuildTask()
             self._extend_cpp_with_app(args)
 
+        elif build_type == 'gradle':
+            extension = GradleBuildTask()
+
         else:
             assert False, 'Unknown build type: ' + build_type
 
@@ -189,6 +194,8 @@ class RosTask(TaskExtensionPoint):
             extension = CmakeTestTask()
         elif build_type == 'ament_python':
             extension = PythonTestTask()
+        elif build_type == 'gradle':
+            extension = GradleTestTask()
         else:
             assert False, 'Unknown build type: ' + build_type
 
