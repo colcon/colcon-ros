@@ -10,6 +10,7 @@ from colcon_core.environment import create_environment_scripts
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.shell import create_environment_hook
+from colcon_core.shell import get_shell_extensions
 from colcon_core.task import create_file
 from colcon_core.task import install
 from colcon_core.task import TaskExtensionPoint
@@ -54,12 +55,18 @@ class RosTask(TaskExtensionPoint):
         additional_hooks = []
         if build_type == 'ament_cmake':
             extension = CmakeBuildTask()
-            additional_hooks += [
-                'share/{pkg.name}/local_setup.bash'.format_map(locals()),
-                'share/{pkg.name}/local_setup.bat'.format_map(locals()),
-                'share/{pkg.name}/local_setup.ps1'.format_map(locals()),
-                'share/{pkg.name}/local_setup.sh'.format_map(locals()),
-            ]
+
+            # add a hook for each available shell
+            shell_extensions = get_shell_extensions()
+            file_extensions = []
+            for shell_extensions_same_prio in shell_extensions.values():
+                for shell_extension in shell_extensions_same_prio.values():
+                    file_extensions += shell_extension.get_file_extensions()
+            for file_extension in sorted(file_extensions):
+                additional_hooks.append(
+                    'share/{pkg.name}/local_setup.{file_extension}'
+                    .format_map(locals()))
+
             if args.test_result_base:
                 if args.cmake_args is None:
                     args.cmake_args = []
