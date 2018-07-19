@@ -59,6 +59,7 @@ class RosTask(TaskExtensionPoint):
                 'share/{pkg.name}/local_setup.bat'.format_map(locals()),
                 'share/{pkg.name}/local_setup.ps1'.format_map(locals()),
                 'share/{pkg.name}/local_setup.sh'.format_map(locals()),
+                'share/{pkg.name}/local_setup.zsh'.format_map(locals()),
             ]
             if args.test_result_base:
                 if args.cmake_args is None:
