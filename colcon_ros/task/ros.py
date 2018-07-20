@@ -14,6 +14,8 @@ from colcon_core.shell import get_shell_extensions
 from colcon_core.task import create_file
 from colcon_core.task import install
 from colcon_core.task import TaskExtensionPoint
+from colcon_cargo.task.cargo.build import CargoBuildTask
+from colcon_cargo.task.cargo.test import CargoTestTask
 from colcon_core.task.python.build import PythonBuildTask
 from colcon_core.task.python.test import PythonTestTask
 from colcon_ros.package_identification.ros import get_package_with_build_type
@@ -118,6 +120,20 @@ class RosTask(TaskExtensionPoint):
             extension = CmakeBuildTask()
             self._extend_cpp_with_app(args)
 
+        elif build_type == 'cargo':
+            extension = CargoBuildTask()
+            additional_hooks += create_environment_hook(
+                'ament_prefix_path', Path(args.install_base), pkg.name,
+                'AMENT_PREFIX_PATH', '', mode='prepend')
+            # create package marker in ament resource index
+            create_file(
+                args, 'share/ament_index/resource_index/packages/{pkg.name}'
+                .format_map(locals()))
+            # copy / symlink package manifest
+            install(
+                args, 'package.xml', 'share/{pkg.name}/package.xml'
+                .format_map(locals()))
+
         else:
             assert False, 'Unknown build type: ' + build_type
 
@@ -196,6 +212,8 @@ class RosTask(TaskExtensionPoint):
             extension = CmakeTestTask()
         elif build_type == 'ament_python':
             extension = PythonTestTask()
+        elif build_type == 'cargo':
+            extension = CargoTestTask()
         else:
             assert False, 'Unknown build type: ' + build_type
 
