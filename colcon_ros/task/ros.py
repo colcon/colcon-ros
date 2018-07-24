@@ -16,6 +16,8 @@ from colcon_core.task import install
 from colcon_core.task import TaskExtensionPoint
 from colcon_core.task.python.build import PythonBuildTask
 from colcon_core.task.python.test import PythonTestTask
+from colcon_gradle.task.gradle.build import GradleBuildTask
+from colcon_gradle.task.gradle.test import GradleTestTask
 from colcon_ros.package_identification.ros import get_package_with_build_type
 
 logger = colcon_logger.getChild(__name__)
@@ -118,6 +120,20 @@ class RosTask(TaskExtensionPoint):
             extension = CmakeBuildTask()
             self._extend_cpp_with_app(args)
 
+        elif build_type == 'gradle':
+            extension = GradleBuildTask()
+            deps = []
+            for dep in self.context.pkg.dependencies['build'] or []:
+                if dep in self.context.dependencies:
+                    deps.append(self.context.dependencies[dep])
+            ros_gradle_args = [
+                '-Pcolcon.source_space=' + args.path,
+                '-Pcolcon.build_space=' + args.build_base,
+                '-Pcolcon.install_space=' + args.install_base,
+                '-Pcolcon.dependencies=' + ':'.join(deps),
+            ]
+            args.gradle_args += ros_gradle_args
+
         else:
             assert False, 'Unknown build type: ' + build_type
 
@@ -196,6 +212,19 @@ class RosTask(TaskExtensionPoint):
             extension = CmakeTestTask()
         elif build_type == 'ament_python':
             extension = PythonTestTask()
+        elif build_type == 'gradle':
+            extension = GradleTestTask()
+            deps = []
+            for dep in self.context.pkg.dependencies['test'] or []:
+                if dep in self.context.dependencies:
+                    deps.append(self.context.dependencies[dep])
+            ros_gradle_args = [
+                '-Pcolcon.source_space=' + args.path,
+                '-Pcolcon.build_space=' + args.build_base,
+                '-Pcolcon.install_space=' + args.install_base,
+                '-Pcolcon.dependencies=' + ':'.join(deps),
+            ]
+            args.gradle_args += ros_gradle_args
         else:
             assert False, 'Unknown build type: ' + build_type
 
