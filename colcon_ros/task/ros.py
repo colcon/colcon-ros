@@ -115,6 +115,17 @@ class RosTask(TaskExtensionPoint):
 
         elif build_type == 'gradle':
             extension = GradleBuildTask()
+            deps = []
+            for dep in self.context.pkg.dependencies['build'] or []:
+                if dep in self.context.dependencies:
+                    deps.append(self.context.dependencies[dep])
+            ros_gradle_args = [
+                '-Pcolcon.source_space=' + args.path,
+                '-Pcolcon.build_space=' + args.build_base,
+                '-Pcolcon.install_space=' + args.install_base,
+                '-Pcolcon.dependencies=' + ':'.join(deps),
+            ]
+            args.gradle_args += ros_gradle_args
 
         else:
             assert False, 'Unknown build type: ' + build_type
@@ -196,6 +207,17 @@ class RosTask(TaskExtensionPoint):
             extension = PythonTestTask()
         elif build_type == 'gradle':
             extension = GradleTestTask()
+            deps = []
+            for dep in self.context.pkg.dependencies['test'] or []:
+                if dep in self.context.dependencies:
+                    deps.append(self.context.dependencies[dep])
+            ros_gradle_args = [
+                '-Pcolcon.source_space=' + args.path,
+                '-Pcolcon.build_space=' + args.build_base,
+                '-Pcolcon.install_space=' + args.install_base,
+                '-Pcolcon.dependencies=' + ':'.join(deps),
+            ]
+            args.gradle_args += ros_gradle_args
         else:
             assert False, 'Unknown build type: ' + build_type
 
