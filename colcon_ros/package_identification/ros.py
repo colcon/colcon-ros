@@ -159,7 +159,8 @@ def _get_build_type(pkg):
             'build type'.format_map(locals()))
         return None
 
-    if build_type not in ('ament_cmake', 'ament_python', 'catkin', 'cmake'):
+    if build_type not in ('ament_cmake', 'ament_python', 'catkin', 'cmake',
+                          'ros_gradle'):
         path = os.path.dirname(pkg.filename)
         logger.debug(
             "ROS package '{pkg.name}' in '{path}' has unknown build "
