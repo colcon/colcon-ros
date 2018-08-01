@@ -61,7 +61,7 @@ class RosPackageIdentification(
                 raise IgnoreLocationException()
             return
 
-        desc.type = 'ros'
+        desc.type = 'ros.{build_type}'.format_map(locals())
 
         # use package name from manifest if not already set
         # e.g. from external configuration
