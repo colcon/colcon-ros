@@ -5,7 +5,8 @@
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.task import TaskExtensionPoint
-from colcon_ros_gradle.task.ros_gradle.test import RosGradleTestTask as RosGradleTestTask_
+from colcon_ros_gradle.task.ros_gradle.test import RosGradleTestTask \
+    as RosGradleTestTask_
 
 logger = colcon_logger.getChild(__name__)
 
@@ -20,8 +21,8 @@ class RosGradleTestTask(TaskExtensionPoint):
     async def test(self):  # noqa: D102
         args = self.context.args
         logger.info(
-            "Testing ROS package in '{args.path}' with build type 'ros-gradle'"
-            .format_map(locals()))
+            "Testing ROS package in '{args.path}' with build type "
+            "'ros-gradle'".format_map(locals()))
 
         # reuse Gradle test task
         extension = RosGradleTestTask_()
