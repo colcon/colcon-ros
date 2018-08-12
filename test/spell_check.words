@@ -4,6 +4,7 @@ cmake
 colcon
 fallback
 github
+gradle
 https
 kislyuk
 noqa
