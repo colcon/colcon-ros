@@ -152,18 +152,9 @@ def _get_build_type(pkg):
     """Get the build type of the ROS package."""
     from catkin_pkg.package import InvalidPackage
     try:
-        build_type = pkg.get_build_type()
+        return pkg.get_build_type()
     except InvalidPackage:
         logger.warn(
             "ROS package '{pkg.name}' in '{path}' has more than one "
             'build type'.format_map(locals()))
         return None
-
-    if build_type not in ('ament_cmake', 'ament_python', 'catkin', 'cmake'):
-        path = os.path.dirname(pkg.filename)
-        logger.debug(
-            "ROS package '{pkg.name}' in '{path}' has unknown build "
-            "type '{build_type}'".format_map(locals()))
-        return None
-
-    return build_type
