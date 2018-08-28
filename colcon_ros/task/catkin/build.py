@@ -81,16 +81,13 @@ class CatkinBuildTask(TaskExtensionPoint):
             for shell_extension in shell_extensions_same_prio.values():
                 file_extensions += shell_extension.get_file_extensions()
 
-        # register custom hooks created via catkin_add_env_hooks
+        # register hooks created via catkin_add_env_hooks
+        custom_hooks_path = Path(args.install_base) / \
+            'share' / self.context.pkg.name / 'profile.d'
+
         for file_extension in file_extensions:
-            custom_hook_manifest = \
-                Path(args.install_base) / 'etc' / self.context.pkg.name / \
-                ('profile.' + file_extension + '.manifest')
-            if custom_hook_manifest.exists():
-                hook_paths = sorted(
-                    custom_hook_manifest.read_text().splitlines())
-                additional_hooks += [
-                    Path(args.install_base) / hook for hook in hook_paths]
+            additional_hooks += sorted(
+                custom_hooks_path.glob('*.' + file_extension))
 
         create_environment_scripts(
             self.context.pkg, args, additional_hooks=additional_hooks)
