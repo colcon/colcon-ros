@@ -1,5 +1,6 @@
 ament
 argcomplete
+cfg
 cmake
 colcon
 fallback
