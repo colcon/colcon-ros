@@ -85,7 +85,8 @@ class CatkinBuildTask(TaskExtensionPoint):
             'share' / self.context.pkg.name / 'catkin_env_hook'
         for file_extension in file_extensions:
             additional_hooks += sorted(
-                custom_hooks_path.glob('*.' + file_extension))
+                custom_hooks_path.glob(
+                    '*.{file_extension}'.format_map(locals())))
 
         create_environment_scripts(
             self.context.pkg, args, additional_hooks=additional_hooks)
