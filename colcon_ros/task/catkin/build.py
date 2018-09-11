@@ -9,6 +9,7 @@ from colcon_core.environment import create_environment_scripts
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.shell import create_environment_hook
+from colcon_core.shell import get_shell_extensions
 from colcon_core.task import TaskExtensionPoint
 
 logger = colcon_logger.getChild(__name__)
@@ -73,6 +74,20 @@ class CatkinBuildTask(TaskExtensionPoint):
                         'python2path', Path(args.install_base),
                         self.context.pkg.name,
                         'PYTHONPATH', str(rel_python_path), mode='prepend')
+
+        # register hooks created via catkin_add_env_hooks
+        shell_extensions = get_shell_extensions()
+        file_extensions = []
+        for shell_extensions_same_prio in shell_extensions.values():
+            for shell_extension in shell_extensions_same_prio.values():
+                file_extensions += shell_extension.get_file_extensions()
+        custom_hooks_path = Path(args.install_base) / \
+            'share' / self.context.pkg.name / 'catkin_env_hook'
+        for file_extension in file_extensions:
+            additional_hooks += sorted(
+                custom_hooks_path.glob(
+                    '*.{file_extension}'.format_map(locals())))
+
         create_environment_scripts(
             self.context.pkg, args, additional_hooks=additional_hooks)
 
