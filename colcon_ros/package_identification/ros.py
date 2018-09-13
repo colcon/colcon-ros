@@ -182,7 +182,7 @@ def _get_build_type(pkg):
     try:
         return pkg.get_build_type()
     except InvalidPackage:
-        logger.warn(
+        logger.warning(
             "ROS package '{pkg.name}' in '{path}' has more than one "
             'build type'.format_map(locals()))
         return None
