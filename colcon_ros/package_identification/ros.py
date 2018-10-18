@@ -3,6 +3,7 @@
 
 import os
 
+from colcon_core.dependency_descriptor import DependencyDescriptor
 from colcon_core.package_augmentation import PackageAugmentationExtensionPoint
 from colcon_core.package_identification import IgnoreLocationException
 from colcon_core.package_identification import logger
@@ -82,7 +83,8 @@ class RosPackageIdentification(
         for d in pkg.build_depends + pkg.buildtool_depends:
             assert d.evaluated_condition is not None
             if d.evaluated_condition:
-                desc.dependencies['build'].add(d.name)
+                desc.dependencies['build'].add(DependencyDescriptor(
+                    d.name, metadata=_create_metadata(d)))
 
         for d in (
             pkg.build_export_depends +
@@ -91,12 +93,14 @@ class RosPackageIdentification(
         ):
             assert d.evaluated_condition is not None
             if d.evaluated_condition:
-                desc.dependencies['run'].add(d.name)
+                desc.dependencies['run'].add(DependencyDescriptor(
+                    d.name, metadata=_create_metadata(d)))
 
         for d in pkg.test_depends:
             assert d.evaluated_condition is not None
             if d.evaluated_condition:
-                desc.dependencies['test'].add(d.name)
+                desc.dependencies['test'].add(DependencyDescriptor(
+                    d.name, metadata=_create_metadata(d)))
 
         # for Python build types ensure that a setup.py file exists
         if build_type == 'ament_python':
@@ -144,8 +148,8 @@ class RosPackageIdentification(
                     continue
                 group_depend.extract_group_members(pkgs)
                 for name in group_depend.members:
-                    desc.dependencies['build'].add(name)
-                    desc.dependencies['run'].add(name)
+                    desc.dependencies['build'].add(DependencyDescriptor(name))
+                    desc.dependencies['run'].add(DependencyDescriptor(name))
 
 
 def get_package_with_build_type(path: str):
@@ -186,3 +190,18 @@ def _get_build_type(pkg):
             "ROS package '{pkg.name}' in '{path}' has more than one "
             'build type'.format_map(locals()))
         return None
+
+
+def _create_metadata(dependency):
+    metadata = {}
+    attributes = (
+        'version_lte',
+        'version_lt',
+        'version_gte',
+        'version_gt',
+        'version_eq',
+    )
+    for attr in attributes:
+        if getattr(dependency, attr, None) is not None:
+            metadata[attr] = getattr(dependency, attr)
+    return metadata
