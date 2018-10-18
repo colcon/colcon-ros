@@ -194,14 +194,14 @@ def _get_build_type(pkg):
 
 def _create_metadata(dependency):
     metadata = {}
-    if dependency.version_lte is not None:
-        metadata['version_lte'] = dependency.version_lte
-    if dependency.version_lt is not None:
-        metadata['version_lt'] = dependency.version_lt
-    if dependency.version_gte is not None:
-        metadata['version_gte'] = dependency.version_gte
-    if dependency.version_gt is not None:
-        metadata['version_gt'] = dependency.version_gt
-    if dependency.version_eq is not None:
-        metadata['version_eq'] = dependency.version_eq
+    attributes = (
+        'version_lte',
+        'version_lt',
+        'version_gte',
+        'version_gt',
+        'version_eq',
+    )
+    for attr in attributes:
+        if getattr(dependency, attr, None) is not None:
+            metadata[attr] = getattr(dependency, attr)
     return metadata
