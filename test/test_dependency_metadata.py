@@ -68,7 +68,7 @@ def test_version_contraint_gte():
     mock.version_gt = None
     mock.version_lt = None
     mock.version_lte = None
-    
+
     mock.version_gte = '10.45.5'
 
     metadata = _create_metadata(mock)
@@ -76,7 +76,7 @@ def test_version_contraint_gte():
     assert metadata['version_gte'] == '10.45.5'
 
 
-def test_version_constraint_None():
+def test_version_constraint_none():
     mock = Mock()
     mock.version_eq = None
     mock.version_gt = None
