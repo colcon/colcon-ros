@@ -6,7 +6,7 @@ from colcon_cmake.task.cmake.build import CmakeBuildTask as CmakeBuildTask_
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.task import TaskExtensionPoint
-from colcon_ros.task import extend_cpp_with_app
+from colcon_ros.task import append_app_to_cpp
 
 logger = colcon_logger.getChild(__name__)
 
@@ -28,6 +28,4 @@ class CmakeBuildTask(TaskExtensionPoint):
         extension = CmakeBuildTask_()
         extension.set_context(context=self.context)
 
-        extend_cpp_with_app(args)
-
-        return await extension.build()
+        return await extension.build(environment_callback=append_app_to_cpp)
