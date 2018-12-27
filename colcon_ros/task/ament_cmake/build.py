@@ -8,7 +8,7 @@ from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.shell import get_shell_extensions
 from colcon_core.task import TaskExtensionPoint
-from colcon_ros.task import extend_cpp_with_app
+from colcon_ros.task import append_app_to_cpp
 
 logger = colcon_logger.getChild(__name__)
 
@@ -67,6 +67,6 @@ class AmentCmakeBuildTask(TaskExtensionPoint):
                 args.cmake_args = []
             args.cmake_args += args.ament_cmake_args
 
-        extend_cpp_with_app(args)
-
-        return await extension.build(additional_hooks=additional_hooks)
+        return await extension.build(
+            environment_callback=append_app_to_cpp,
+            additional_hooks=additional_hooks)
