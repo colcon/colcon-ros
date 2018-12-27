@@ -2,6 +2,7 @@
 # Licensed under the Apache License, Version 2.0
 
 import os
+import warnings
 
 
 def append_app_to_cpp(env):
@@ -19,6 +20,9 @@ def append_app_to_cpp(env):
 
 def extend_cpp_with_app(args):
     """Extend CMAKE_PREFIX_PATH with AMENT_PREFIX_PATH."""
+    warnings.warn(
+        'colcon_ros.task.extend_cpp_with_app() will be removed in the future',
+        DeprecationWarning, stacklevel=2)
     ament_prefix_path = os.environ.get('AMENT_PREFIX_PATH')
     if ament_prefix_path:
         ament_prefix_path = ament_prefix_path.replace(
