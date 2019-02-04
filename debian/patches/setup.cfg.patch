@@ -18,6 +18,6 @@ Author: Dirk Thomas <web@dirk-thomas.net>
 +	# listing it here but not installing it in the Debian package
 +	# would result in a runtime error by pkg_resources
 +	# catkin_pkg
- 	colcon-cmake>=0.2.5
- 	colcon-core>=0.3.10
+ 	colcon-cmake>=0.2.6
+ 	colcon-core>=0.3.16
  	colcon-pkg-config
