@@ -1,11 +1,16 @@
-# Copyright 2016-2018 Dirk Thomas
+# Copyright 2016-2019 Dirk Thomas
 # Licensed under the Apache License, Version 2.0
 
+import os
+from pathlib import Path
 
 from colcon_cmake.task.cmake.test import CmakeTestTask
+from colcon_core.environment import create_environment_scripts_only
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
+from colcon_core.shell import create_environment_hook
 from colcon_core.task import TaskExtensionPoint
+from colcon_ros.task.catkin import create_pythonpath_environment_hook
 
 logger = colcon_logger.getChild(__name__)
 
@@ -22,6 +27,24 @@ class CatkinTestTask(TaskExtensionPoint):
         logger.info(
             "Testing ROS package in '{args.path}' with build type 'catkin'"
             .format_map(locals()))
+
+        # for catkin packages it is expected that the devel space
+        # and not the install space is in the environment for testing
+        self.context.dependencies[self.context.pkg.name] = \
+            os.path.join(self.context.args.build_base, 'devel')
+
+        # additional hooks
+        additional_hooks = create_environment_hook(
+            'ros_package_path', Path(args.build_base) / 'devel',
+            self.context.pkg.name,
+            'ROS_PACKAGE_PATH', args.path, mode='prepend')
+        additional_hooks += create_pythonpath_environment_hook(
+            Path(args.build_base) / 'devel', self.context.pkg.name)
+
+        # generate the necessary setup files for the devel space
+        create_environment_scripts_only(
+            Path(args.build_base) / 'devel', self.context.pkg,
+            additional_hooks=additional_hooks)
 
         # reuse CMake test task
         extension = CmakeTestTask()

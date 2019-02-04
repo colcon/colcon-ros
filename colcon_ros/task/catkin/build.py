@@ -1,4 +1,4 @@
-# Copyright 2016-2018 Dirk Thomas
+# Copyright 2016-2019 Dirk Thomas
 # Licensed under the Apache License, Version 2.0
 
 import os
@@ -11,6 +11,7 @@ from colcon_core.plugin_system import satisfies_version
 from colcon_core.shell import create_environment_hook
 from colcon_core.shell import get_shell_extensions
 from colcon_core.task import TaskExtensionPoint
+from colcon_ros.task.catkin import create_pythonpath_environment_hook
 
 logger = colcon_logger.getChild(__name__)
 
@@ -29,6 +30,12 @@ class CatkinBuildTask(TaskExtensionPoint):
             help="Pass arguments to 'catkin' packages. "
             'Arguments matching other options must be prefixed by a space,\n'
             'e.g. --catkin-cmake-args " --help"')
+        parser.add_argument(
+            '--catkin-skip-building-tests',
+            action='store_true',
+            help="By default the 'tests' target of 'catkin' packages is "
+            "invoked. If running 'colcon test' later isn't intended this can "
+            'be skipped')
 
     async def build(self):  # noqa: D102
         args = self.context.args
@@ -52,28 +59,24 @@ class CatkinBuildTask(TaskExtensionPoint):
         if args.catkin_cmake_args:
             args.cmake_args += args.catkin_cmake_args
 
-        # additional hooks
-        additional_hooks = create_environment_hook(
-            'ros_package_path', Path(args.install_base), self.context.pkg.name,
-            'ROS_PACKAGE_PATH', 'share', mode='prepend')
+        # invoke the build
+        additional_targets = []
+        # if no specific target is specified consider building the 'tests'
+        # target and continue if such a target doesn't exist
+        if args.cmake_target is None:
+            if not args.catkin_skip_building_tests:
+                additional_targets.append('tests')
+                args.cmake_target_skip_unavailable = True
+        rc = await extension.build(
+            skip_hook_creation=True, additional_targets=additional_targets)
 
         # for catkin packages add additional hooks after the package has
         # been built and installed depending on the installed files
-        rc = await extension.build(skip_hook_creation=True)
-
-        # add Python 2 specific path to PYTHONPATH if it exists
-        if os.environ.get('ROS_PYTHON_VERSION', '2') == '2':
-            for subdirectory in ('dist-packages', 'site-packages'):
-                python_path = Path(args.install_base) / \
-                    'lib' / 'python2.7' / subdirectory
-                logger.log(1, "checking '%s'" % python_path)
-                if python_path.exists():
-                    rel_python_path = python_path.relative_to(
-                        args.install_base)
-                    additional_hooks += create_environment_hook(
-                        'python2path', Path(args.install_base),
-                        self.context.pkg.name,
-                        'PYTHONPATH', str(rel_python_path), mode='prepend')
+        additional_hooks = create_environment_hook(
+            'ros_package_path', Path(args.install_base), self.context.pkg.name,
+            'ROS_PACKAGE_PATH', 'share', mode='prepend')
+        additional_hooks += create_pythonpath_environment_hook(
+            Path(args.install_base), self.context.pkg.name)
 
         # register hooks created via catkin_add_env_hooks
         shell_extensions = get_shell_extensions()

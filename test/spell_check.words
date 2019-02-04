@@ -1,6 +1,7 @@
 ament
 apache
 argcomplete
+basepath
 buildtool
 cmake
 colcon
@@ -26,6 +27,7 @@ plugin
 prepend
 pytest
 pythonpath
+rtype
 scspell
 sdist
 setuptools
