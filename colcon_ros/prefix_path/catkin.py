@@ -39,8 +39,21 @@ class CmakePrefixPath(PrefixPathExtensionPoint):
                         "The path '{path}' in the environment variable "
                         "CMAKE_PREFIX_PATH doesn't exist"
                         .format_map(locals()))
-                _get_cmake_prefix_path_warnings.add(path)
+                    _get_cmake_prefix_path_warnings.add(path)
                 continue
             if not os.path.exists(os.path.join(path, '.catkin')):
+                continue
+            for filename in os.listdir(path):
+                if filename.startswith('local_setup.'):
+                    break
+            else:
+                if path not in _get_cmake_prefix_path_warnings:
+                    logger.warning(
+                        "The path '{path}' in the environment variable "
+                        'CMAKE_PREFIX_PATH seems to be a catkin workspace but '
+                        "it doesn't contain any 'local_setup.*' files. Maybe "
+                        'the catkin version is not up-to-date?'
+                        .format_map(locals()))
+                    _get_cmake_prefix_path_warnings.add(path)
                 continue
             paths.append(path)
