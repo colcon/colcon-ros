@@ -19,5 +19,5 @@ Author: Dirk Thomas <web@dirk-thomas.net>
 +	# would result in a runtime error by pkg_resources
 +	# catkin_pkg
  	colcon-cmake>=0.2.6
- 	colcon-core>=0.3.16
+ 	colcon-core>=0.3.18
  	colcon-pkg-config
