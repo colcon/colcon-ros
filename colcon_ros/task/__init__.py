@@ -5,8 +5,36 @@ import os
 import warnings
 
 
+def add_app_to_cpp(env):
+    """
+    Add AMENT_PREFIX_PATH to CMAKE_PREFIX_PATH.
+
+    Each ament prefix path is inserted before the first catkin prefix path or
+    at the end if none of the CMake prefix paths has a '.catkin' marker file.
+    """
+    ament_prefix_path = os.environ.get('AMENT_PREFIX_PATH')
+    if ament_prefix_path:
+        cmake_prefix_path = env.get('CMAKE_PREFIX_PATH')
+        cpp = cmake_prefix_path.split(os.pathsep) if cmake_prefix_path else []
+        cpp_has_dot_catkin = [
+            os.path.exists(os.path.join(p, '.catkin')) for p in cpp]
+        app = ament_prefix_path.split(os.pathsep)
+        for p in app:
+            if p not in cpp:
+                try:
+                    index = cpp_has_dot_catkin.index(True)
+                    cpp.insert(index, p)
+                    cpp_has_dot_catkin.insert(index, False)
+                except ValueError:
+                    cpp.append(p)
+        env['CMAKE_PREFIX_PATH'] = os.pathsep.join(cpp)
+
+
 def append_app_to_cpp(env):
     """Append AMENT_PREFIX_PATH to CMAKE_PREFIX_PATH."""
+    warnings.warn(
+        'colcon_ros.task.append_app_to_cpp() will be removed in the future',
+        DeprecationWarning, stacklevel=2)
     ament_prefix_path = os.environ.get('AMENT_PREFIX_PATH')
     if ament_prefix_path:
         cmake_prefix_path = env.get('CMAKE_PREFIX_PATH')
