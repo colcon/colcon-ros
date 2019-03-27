@@ -1,18 +1,10 @@
 language: python
 python: "3.5"
-dist: trusty
+dist: xenial
 sudo: true
 install:
-  - pip install -U setuptools
-  # install_requires
-  - pip install -U git+https://github.com/colcon/colcon-core
-  - pip install -U git+https://github.com/colcon/colcon-library-path
-  - pip install -U git+https://github.com/colcon/colcon-cmake
-  - pip install -U git+https://github.com/colcon/colcon-python-setup-py
-  # tests_require
-  - pip install -U flake8-blind-except flake8-builtins flake8-class-newline flake8-comprehensions flake8-deprecated flake8-docstrings flake8-quotes pep8-naming pylint pytest pytest-cov scspell3k
+  - pip install tox-travis
 script:
-  # invoke pytest
-  - python -m pytest --cov=colcon_ros --cov-branch
+  - tox
 notifications:
   email: false

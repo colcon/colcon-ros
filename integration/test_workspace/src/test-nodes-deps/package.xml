@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>test-nodes-deps</name>
+  <version>0.0.0</version>
+  <description>Test Nodes for Catkin Dependencies</description>
+  <maintainer email="matmur@amazon.com">matmur</maintainer>
+  <license>TODO</license>
+  <buildtool_depend>cmake</buildtool_depend>
+  <build_depend>test-nodes</build_depend>
+  <depend>aws_cpp_sdk_monitoring</depend>
+  <export>
+  </export>
+</package>
