@@ -37,4 +37,32 @@ class AmentPrefixPath(PrefixPathExtensionPoint):
                         .format_map(locals()))
                 _get_ament_prefix_path_warnings.add(path)
                 continue
+
+            for filename in os.listdir(path):
+                if filename.startswith('local_setup.'):
+                    break
+            else:
+                parent_path = os.path.dirname(path)
+                marker_file = os.path.join(
+                    parent_path, '.colcon_install_layout')
+                if not os.path.exists(marker_file):
+                    if path not in _get_ament_prefix_path_warnings:
+                        logger.warning(
+                            "The path '{path}' in the environment variable "
+                            "AMENT_PREFIX_PATH doesn't contain any "
+                            "'local_setup.*' files.".format_map(locals()))
+                        _get_ament_prefix_path_warnings.add(path)
+                    continue
+                with open(marker_file, 'r') as h:
+                    install_layout = h.read().rstrip()
+                if install_layout != 'isolated':
+                    if path not in _get_ament_prefix_path_warnings:
+                        logger.warning(
+                            "The path '{path}' in the environment variable "
+                            "AMENT_PREFIX_PATH doesn't use the expected "
+                            "install layout 'isolated'.".format_map(locals()))
+                        _get_ament_prefix_path_warnings.add(path)
+                    continue
+                path = parent_path
+
             paths.append(path)
