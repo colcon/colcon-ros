@@ -27,6 +27,7 @@ plugin
 prepend
 pytest
 pythonpath
+rstrip
 rtype
 scspell
 sdist
