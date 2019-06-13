@@ -30,13 +30,18 @@ class CmakeBuildTask(TaskExtensionPoint):
         extension = CmakeBuildTask_()
         extension.set_context(context=self.context)
 
-        #Add extra CMake variables to help packages detect ROS
+        # Add extra CMake variables to help packages detect ROS
         if self.context.args.cmake_args is None:
             self.context.args.cmake_args = []
-        self.context.args.cmake_args += ['-DCOLCON_VERSION:STRING=' + str(colcon_core_version)]
+        self.context.args.cmake_args += ['-D' + 'COLCON_VERSION:STRING='
+                                         + str(colcon_core_version)]
         if 'ROS_VERSION' in environ:
-            self.context.args.cmake_args += ['-DCOLCON_ROS_VERSION:STRING=' + environ['ROS_VERSION']]
+            self.context.args.cmake_args += ['-D'
+                                             + 'COLCON_ROS_VERSION:STRING='
+                                             + environ['ROS_VERSION']]
         if 'ROS_DISTRO' in environ:
-            self.context.args.cmake_args += ['-DCOLCON_ROS_DISTRO:STRING=' + environ['ROS_DISTRO']]
+            self.context.args.cmake_args += ['-D'
+                                             + 'COLCON_ROS_DISTRO:STRING='
+                                             + environ['ROS_DISTRO']]
 
         return await extension.build(environment_callback=add_app_to_cpp)
