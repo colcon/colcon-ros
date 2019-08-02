@@ -1,4 +1,4 @@
-# Copyright 2016-2018 Dirk Thomas
+# Copyright 2016-2019 Dirk Thomas
 # Licensed under the Apache License, Version 2.0
 
 import os
@@ -78,6 +78,8 @@ class RosPackageIdentification(
         # e.g. from external configuration
         if desc.name is None:
             desc.name = pkg.name
+
+        desc.metadata['version'] = pkg.version
 
         # get dependencies
         for d in pkg.build_depends + pkg.buildtool_depends:
