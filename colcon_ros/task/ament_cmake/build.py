@@ -2,11 +2,13 @@
 # Licensed under the Apache License, Version 2.0
 
 import os
+from pathlib import Path
 
 from colcon_cmake.task.cmake.build import CmakeBuildTask
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
-from colcon_core.shell import get_shell_extensions
+from colcon_core.shell import create_environment_hook, \
+    get_shell_extensions
 from colcon_core.task import TaskExtensionPoint
 from colcon_ros.task import add_app_to_cpp
 
@@ -39,7 +41,9 @@ class AmentCmakeBuildTask(TaskExtensionPoint):
         extension.set_context(context=self.context)
 
         # add a hook for each available shell
-        additional_hooks = []
+        additional_hooks = create_environment_hook(
+            'ament_current_prefix', Path(args.install_base),
+            self.context.pkg.name, 'AMENT_CURRENT_PREFIX', '', mode='prepend')
         shell_extensions = get_shell_extensions()
         file_extensions = []
         for shell_extensions_same_prio in shell_extensions.values():
