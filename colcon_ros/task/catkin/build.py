@@ -12,6 +12,7 @@ from colcon_core.shell import create_environment_hook
 from colcon_core.shell import get_shell_extensions
 from colcon_core.task import TaskExtensionPoint
 from colcon_ros.task.catkin import create_pythonpath_environment_hook
+from colcon_ros.task.cmake import create_pkg_config_path_environment_hooks
 
 logger = colcon_logger.getChild(__name__)
 
@@ -76,6 +77,8 @@ class CatkinBuildTask(TaskExtensionPoint):
             'ros_package_path', Path(args.install_base), self.context.pkg.name,
             'ROS_PACKAGE_PATH', 'share', mode='prepend')
         additional_hooks += create_pythonpath_environment_hook(
+            Path(args.install_base), self.context.pkg.name)
+        additional_hooks += create_pkg_config_path_environment_hooks(
             Path(args.install_base), self.context.pkg.name)
 
         # register hooks created via catkin_add_env_hooks
