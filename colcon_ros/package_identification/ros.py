@@ -9,11 +9,9 @@ from colcon_core.package_identification import IgnoreLocationException
 from colcon_core.package_identification import logger
 from colcon_core.package_identification \
     import PackageIdentificationExtensionPoint
-from colcon_core.package_identification.python import get_configuration
+from colcon_core.package_identification.python import get_setup_result
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.plugin_system import SkipExtensionException
-from colcon_python_setup_py.package_identification.python_setup_py \
-    import get_setup_arguments_with_context
 
 
 # mapping paths to tuples containing the ROS package and its build type
@@ -104,28 +102,11 @@ class RosPackageIdentification(
                 desc.dependencies['test'].add(DependencyDescriptor(
                     d.name, metadata=_create_metadata(d)))
 
-        # for Python build types ensure that a setup.py file exists
+        # for Python packages provide the options from the setup.py/cfg files
         if build_type == 'ament_python':
-            setup_cfg = desc.path / 'setup.cfg'
-            for _ in (1, ):
-                # try to get information from setup.cfg file
-                if setup_cfg.is_file():
-                    config = get_configuration(setup_cfg)
-                    name = config.get('metadata', {}).get('name')
-                    if name:
-                        options = config.get('options', {})
-
-                        def getter(env):
-                            nonlocal options
-                            return options
-                        break
-            else:
-                # use information from setup.py file
-
-                def getter(env):  # noqa: F811
-                    nonlocal desc
-                    return get_setup_arguments_with_context(
-                        str(desc.path / 'setup.py'), env)
+            def getter(env):
+                nonlocal setup_py
+                return get_setup_result(setup_py, env=env)
 
             desc.metadata['get_python_setup_options'] = getter
 
