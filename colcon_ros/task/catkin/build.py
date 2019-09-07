@@ -1,6 +1,7 @@
 # Copyright 2016-2019 Dirk Thomas
 # Licensed under the Apache License, Version 2.0
 
+from collections import OrderedDict
 import os
 from pathlib import Path
 
@@ -83,16 +84,30 @@ class CatkinBuildTask(TaskExtensionPoint):
 
         # register hooks created via catkin_add_env_hooks
         shell_extensions = get_shell_extensions()
-        file_extensions = []
+        file_extensions = OrderedDict()
         for shell_extensions_same_prio in shell_extensions.values():
             for shell_extension in shell_extensions_same_prio.values():
-                file_extensions += shell_extension.get_file_extensions()
+                for file_extension in shell_extension.get_file_extensions():
+                    file_extensions[file_extension] = shell_extension
         custom_hooks_path = Path(args.install_base) / \
             'share' / self.context.pkg.name / 'catkin_env_hook'
-        for file_extension in file_extensions:
-            additional_hooks += sorted(
-                custom_hooks_path.glob(
-                    '*.{file_extension}'.format_map(locals())))
+        for file_extension, shell_extension in file_extensions.items():
+            file_extension_hooks = sorted(custom_hooks_path.glob(
+                '*.{file_extension}'.format_map(locals())))
+            if file_extension_hooks:
+                try:
+                    # try to set CATKIN_ENV_HOOK_WORKSPACE explicitly before
+                    # sourcing these hooks
+                    additional_hooks.append(
+                        shell_extension.create_hook_set_value(
+                            'catkin_env_hook_workspace',
+                            Path(args.install_base), self.context.pkg.name,
+                            'CATKIN_ENV_HOOK_WORKSPACE',
+                            '$COLCON_CURRENT_PREFIX'))
+                except NotImplementedError:
+                    # since not all shell extensions might implement this
+                    pass
+                additional_hooks += file_extension_hooks
 
         create_environment_scripts(
             self.context.pkg, args, additional_hooks=additional_hooks)
