@@ -1,14 +1,18 @@
 # Copyright 2016-2018 Dirk Thomas
 # Licensed under the Apache License, Version 2.0
 
+import os
 from pathlib import Path
 
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.shell import create_environment_hook
+from colcon_core.shell import get_command_environment
 from colcon_core.task import create_file
 from colcon_core.task import install
 from colcon_core.task import TaskExtensionPoint
+from colcon_core.task.python import get_data_files_mapping
+from colcon_core.task.python import get_setup_data
 from colcon_core.task.python.build import PythonBuildTask
 
 logger = colcon_logger.getChild(__name__)
@@ -35,14 +39,59 @@ class AmentPythonBuildTask(TaskExtensionPoint):
         additional_hooks = create_environment_hook(
             'ament_prefix_path', Path(args.install_base),
             self.context.pkg.name, 'AMENT_PREFIX_PATH', '', mode='prepend')
-        # create package marker in ament resource index
-        create_file(
-            args,
-            'share/ament_index/resource_index/packages/{self.context.pkg.name}'
-            .format_map(locals()))
-        # copy / symlink package manifest
-        install(
-            args, 'package.xml', 'share/{self.context.pkg.name}/package.xml'
-            .format_map(locals()))
+
+        # get options from the Python manifest
+        try:
+            env = await get_command_environment(
+                'setup_py', args.build_base, self.context.dependencies)
+        except RuntimeError as e:
+            logger.error(str(e))
+            return 1
+        setup_py_data = get_setup_data(self.context.pkg, env)
+
+        # check if the package index and manifest are being installed
+        data_files = get_data_files_mapping(
+            setup_py_data.get('data_files', []))
+        installs_package_index = False
+        installs_package_manifest = False
+
+        # check if package index and manifest are being installed
+        for source, destination in data_files.items():
+            # work around data files incorrectly defined as not relative
+            if os.path.isabs(source):
+                source = os.path.relpath(source, args.path)
+            if (
+                destination == 'share/ament_index/resource_index/packages/' +
+                self.context.pkg.name
+            ):
+                installs_package_index = True
+            elif (
+                source == 'package.xml' and
+                destination == 'share/{self.context.pkg.name}/package.xml'
+                .format_map(locals())
+            ):
+                installs_package_manifest = True
+
+        # for now implicitly install the marker and the manifest
+        if not installs_package_index:
+            # TODO remove magic helper in the future
+            # create package marker in ament resource index
+            create_file(
+                args,
+                'share/ament_index/resource_index/packages/'
+                '{self.context.pkg.name}'.format_map(locals()))
+        if not installs_package_manifest:
+            # TODO remove magic helper in the future
+            # warn about missing explicit installation
+            logger.warn(
+                "Package '{self.context.pkg.name}' doesn't explicitly install "
+                "the 'package.xml' file (colcon-ros currently does it "
+                'implicitly but that fallback will be removed in the future)'
+                .format_map(locals()))
+            # copy / symlink package manifest
+            install(
+                args, 'package.xml',
+                'share/{self.context.pkg.name}/package.xml'
+                .format_map(locals()))
 
         return await extension.build(additional_hooks=additional_hooks)
