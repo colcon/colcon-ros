@@ -6,6 +6,8 @@ from pathlib import Path
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.shell import create_environment_hook
+from colcon_core.task import create_file
+from colcon_core.task import install
 from colcon_core.task import TaskExtensionPoint
 from colcon_core.task.python.build import PythonBuildTask
 
@@ -33,5 +35,14 @@ class AmentPythonBuildTask(TaskExtensionPoint):
         additional_hooks = create_environment_hook(
             'ament_prefix_path', Path(args.install_base),
             self.context.pkg.name, 'AMENT_PREFIX_PATH', '', mode='prepend')
+        # create package marker in ament resource index
+        create_file(
+            args,
+            'share/ament_index/resource_index/packages/{self.context.pkg.name}'
+            .format_map(locals()))
+        # copy / symlink package manifest
+        install(
+            args, 'package.xml', 'share/{self.context.pkg.name}/package.xml'
+            .format_map(locals()))
 
         return await extension.build(additional_hooks=additional_hooks)
