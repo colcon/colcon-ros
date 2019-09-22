@@ -176,7 +176,7 @@ def _get_package(path: str):
     try:
         pkg = parse_package(path)
     except (AssertionError, InvalidPackage) as e:  # noqa: F841
-        logger.debug(
+        logger.warn(
             "Failed to parse potential ROS package manifest in '{path}': {e}"
             .format_map(locals()))
         return None
