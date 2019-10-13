@@ -186,9 +186,8 @@ def _get_package(path: str):
                 .format_map(locals()))
         else:
             logger.debug(
-                "Failed to parse potential ROS package manifest in" 
-                "'{path}': {e}"
-                .format_map(locals()))
+                'Failed to parse potential ROS package manifest in'
+                "'{path}': {e}".format_map(locals()))
         return None
 
     pkg.evaluate_conditions(os.environ)
