@@ -180,7 +180,7 @@ def _get_package(path: str):
         if has_ros_schema_reference(path):
             logger.debug(
                 "Found ROS schema reference in package manifest in '{path}'"
-                .format_map(locals())
+                .format_map(locals()))
             logger.warn(
                 "Failed to parse ROS package manifest in '{path}': {e}"
                 .format_map(locals()))
