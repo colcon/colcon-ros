@@ -166,6 +166,7 @@ def get_package_with_build_type(path: str):
 
 def _get_package(path: str):
     """Get the ROS package for the given path."""
+    from catkin_pkg.package import has_ros_schema_reference
     from catkin_pkg.package import InvalidPackage
     from catkin_pkg.package import package_exists_at
     from catkin_pkg.package import parse_package
@@ -176,9 +177,17 @@ def _get_package(path: str):
     try:
         pkg = parse_package(path)
     except (AssertionError, InvalidPackage) as e:  # noqa: F841
-        logger.debug(
-            "Failed to parse potential ROS package manifest in '{path}': {e}"
-            .format_map(locals()))
+        if has_ros_schema_reference(path):
+            logger.debug(
+                "Found ROS schema reference in package manifest in '{path}'"
+                .format_map(locals()))
+            logger.warn(
+                "Failed to parse ROS package manifest in '{path}': {e}"
+                .format_map(locals()))
+        else:
+            logger.debug(
+                'Failed to parse potential ROS package manifest in'
+                "'{path}': {e}".format_map(locals()))
         return None
 
     pkg.evaluate_conditions(os.environ)
