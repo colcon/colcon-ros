@@ -12,12 +12,12 @@ Author: Dirk Thomas <web@dirk-thomas.net>
  
  [options]
  install_requires = 
--	catkin_pkg
+-	catkin_pkg>=0.4.14
 +	# to avoid conflicts with ROS 1 this Debian package only depends on
 +	# python3-catkin-pkg-modules and not python3-catkin-pkg
 +	# listing it here but not installing it in the Debian package
 +	# would result in a runtime error by pkg_resources
-+	# catkin_pkg
++	# catkin_pkg>=0.4.14
  	colcon-cmake>=0.2.6
  	colcon-core>=0.3.18
  	colcon-pkg-config
