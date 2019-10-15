@@ -166,10 +166,10 @@ def get_package_with_build_type(path: str):
 
 def _get_package(path: str):
     """Get the ROS package for the given path."""
+    from catkin_pkg.package import has_ros_schema_reference
     from catkin_pkg.package import InvalidPackage
     from catkin_pkg.package import package_exists_at
     from catkin_pkg.package import parse_package
-    from catkin_pkg.package import has_ros_schema_reference
 
     if not package_exists_at(path):
         return None
