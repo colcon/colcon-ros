@@ -14,7 +14,7 @@ from colcon_core.package_identification.python import is_reading_cfg_sufficient
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.plugin_system import SkipExtensionException
 from colcon_python_setup_py.package_identification.python_setup_py \
-    import get_setup_arguments_with_context
+    import get_setup_information
 
 
 # mapping paths to tuples containing the ROS package and its build type
@@ -126,8 +126,8 @@ class RosPackageIdentification(
 
                 def getter(env):  # noqa: F811
                     nonlocal desc
-                    return get_setup_arguments_with_context(
-                        str(desc.path / 'setup.py'), env)
+                    return get_setup_information(
+                        desc.path / 'setup.py', env=env)
 
             desc.metadata['get_python_setup_options'] = getter
 
