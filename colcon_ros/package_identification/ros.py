@@ -10,6 +10,7 @@ from colcon_core.package_identification import logger
 from colcon_core.package_identification \
     import PackageIdentificationExtensionPoint
 from colcon_core.package_identification.python import get_configuration
+from colcon_core.package_identification.python import is_reading_cfg_sufficient
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.plugin_system import SkipExtensionException
 from colcon_python_setup_py.package_identification.python_setup_py \
@@ -110,15 +111,16 @@ class RosPackageIdentification(
             for _ in (1, ):
                 # try to get information from setup.cfg file
                 if setup_cfg.is_file():
-                    config = get_configuration(setup_cfg)
-                    name = config.get('metadata', {}).get('name')
-                    if name:
-                        options = config.get('options', {})
+                    if is_reading_cfg_sufficient(setup_py):
+                        config = get_configuration(setup_cfg)
+                        name = config.get('metadata', {}).get('name')
+                        if name:
+                            options = config.get('options', {})
 
-                        def getter(env):
-                            nonlocal options
-                            return options
-                        break
+                            def getter(env):
+                                nonlocal options
+                                return options
+                            break
             else:
                 # use information from setup.py file
 
