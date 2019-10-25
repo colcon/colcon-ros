@@ -3,6 +3,7 @@
 
 import os
 from pathlib import Path
+import sys
 
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
@@ -57,6 +58,8 @@ class AmentPythonBuildTask(TaskExtensionPoint):
 
         # check if package index and manifest are being installed
         for source, destination in data_files.items():
+            if sys.platform == 'win32':
+                destination = Path(destination).as_posix()
             # work around data files incorrectly defined as not relative
             if os.path.isabs(source):
                 source = os.path.relpath(source, args.path)
