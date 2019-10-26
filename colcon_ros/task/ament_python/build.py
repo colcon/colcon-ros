@@ -75,9 +75,15 @@ class AmentPythonBuildTask(TaskExtensionPoint):
             ):
                 installs_package_manifest = True
 
+        # warn about missing explicit installation
         # for now implicitly install the marker and the manifest
         if not installs_package_index:
             # TODO remove magic helper in the future
+            logger.warn(
+                "Package '{self.context.pkg.name}' doesn't explicitly install "
+                'a marker in the package index (colcon-ros currently does it '
+                'implicitly but that fallback will be removed in the future)'
+                .format_map(locals()))
             # create package marker in ament resource index
             create_file(
                 args,
@@ -85,7 +91,6 @@ class AmentPythonBuildTask(TaskExtensionPoint):
                 '{self.context.pkg.name}'.format_map(locals()))
         if not installs_package_manifest:
             # TODO remove magic helper in the future
-            # warn about missing explicit installation
             logger.warn(
                 "Package '{self.context.pkg.name}' doesn't explicitly install "
                 "the 'package.xml' file (colcon-ros currently does it "
