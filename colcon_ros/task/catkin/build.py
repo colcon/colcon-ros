@@ -98,12 +98,20 @@ class CatkinBuildTask(TaskExtensionPoint):
                 try:
                     # try to set CATKIN_ENV_HOOK_WORKSPACE explicitly before
                     # sourcing these hooks
-                    additional_hooks.append(
-                        shell_extension.create_hook_set_value(
-                            'catkin_env_hook_workspace',
-                            Path(args.install_base), self.context.pkg.name,
-                            'CATKIN_ENV_HOOK_WORKSPACE',
-                            '$COLCON_CURRENT_PREFIX'))
+                    if sys.platform == 'win32':
+                        additional_hooks.append(
+                            shell_extension.create_hook_set_value(
+                                'catkin_env_hook_workspace',
+                                Path(args.install_base), self.context.pkg.name,
+                                'CATKIN_ENV_HOOK_WORKSPACE',
+                                '%COLCON_CURRENT_PREFIX%'))
+                    else:
+                        additional_hooks.append(
+                            shell_extension.create_hook_set_value(
+                                'catkin_env_hook_workspace',
+                                Path(args.install_base), self.context.pkg.name,
+                                'CATKIN_ENV_HOOK_WORKSPACE',
+                                '$COLCON_CURRENT_PREFIX'))
                 except NotImplementedError:
                     # since not all shell extensions might implement this
                     pass
