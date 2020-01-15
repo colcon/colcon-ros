@@ -3,6 +3,7 @@
 
 from collections import OrderedDict
 import os
+import sys
 from pathlib import Path
 
 from colcon_cmake.task.cmake.build import CmakeBuildTask
