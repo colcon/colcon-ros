@@ -103,7 +103,7 @@ class CatkinBuildTask(TaskExtensionPoint):
                             'catkin_env_hook_workspace',
                             Path(args.install_base), self.context.pkg.name,
                             'CATKIN_ENV_HOOK_WORKSPACE',
-                            '$COLCON_CURRENT_PREFIX'))
+                            ''))
                 except NotImplementedError:
                     # since not all shell extensions might implement this
                     pass
