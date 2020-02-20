@@ -39,7 +39,8 @@ class CatkinTestTask(TaskExtensionPoint):
             self.context.pkg.name,
             'ROS_PACKAGE_PATH', args.path, mode='prepend')
         additional_hooks += create_pythonpath_environment_hook(
-            Path(args.build_base) / 'devel', self.context.pkg.name)
+            args.build_base, Path(args.build_base) / 'devel',
+            self.context.pkg.name)
 
         # generate the necessary setup files for the devel space
         create_environment_scripts_only(

@@ -78,7 +78,7 @@ class CatkinBuildTask(TaskExtensionPoint):
             'ros_package_path', Path(args.install_base), self.context.pkg.name,
             'ROS_PACKAGE_PATH', 'share', mode='prepend')
         additional_hooks += create_pythonpath_environment_hook(
-            Path(args.install_base), self.context.pkg.name)
+            args.build_base, Path(args.install_base), self.context.pkg.name)
         additional_hooks += create_pkg_config_path_environment_hooks(
             Path(args.install_base), self.context.pkg.name)
 
