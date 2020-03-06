@@ -51,8 +51,11 @@ class AmentPythonBuildTask(TaskExtensionPoint):
         setup_py_data = get_setup_data(self.context.pkg, env)
 
         # check if the package index and manifest are being installed
-        data_files = get_data_files_mapping(
-            setup_py_data.get('data_files', []))
+        setup_py_data_files = []
+        if 'data_files' in setup_py_data and setup_py_data['data_files'] is not None:
+            setup_py_data_files = setup_py_data['data_files']
+        data_files = get_data_files_mapping(setup_py_data_files)
+
         installs_package_index = False
         installs_package_manifest = False
 
