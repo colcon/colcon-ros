@@ -30,8 +30,7 @@ class CatkinBuildTask(TaskExtensionPoint):
             '--catkin-cmake-args',
             nargs='*', metavar='*', type=str.lstrip,
             help="Pass arguments to 'catkin' packages. "
-            'Arguments matching other options must be prefixed by a space,\n'
-            'e.g. --catkin-cmake-args " --help"')
+            'Arguments matching other options must be prefixed by a space')
         parser.add_argument(
             '--catkin-skip-building-tests',
             action='store_true',

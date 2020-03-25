@@ -25,8 +25,7 @@ class AmentCmakeBuildTask(TaskExtensionPoint):
             '--ament-cmake-args',
             nargs='*', metavar='*', type=str.lstrip,
             help="Pass arguments to 'ament_cmake' packages. "
-            'Arguments matching other options must be prefixed by a space,\n'
-            'e.g. --ament-cmake-args " --help"')
+            'Arguments matching other options must be prefixed by a space')
 
     async def build(self):  # noqa: D102
         args = self.context.args
