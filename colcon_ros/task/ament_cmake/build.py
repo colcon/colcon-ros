@@ -26,6 +26,11 @@ class AmentCmakeBuildTask(TaskExtensionPoint):
             nargs='*', metavar='*', type=str.lstrip,
             help="Pass arguments to 'ament_cmake' packages. "
             'Arguments matching other options must be prefixed by a space')
+        parser.add_argument(
+            '--ament-cmake-pytest-with-coverage',
+            action='store_true',
+            default=False,
+            help='Generate coverage information for Python tests')
 
     async def build(self):  # noqa: D102
         args = self.context.args
@@ -65,6 +70,10 @@ class AmentCmakeBuildTask(TaskExtensionPoint):
             if args.cmake_args is None:
                 args.cmake_args = []
             args.cmake_args += args.ament_cmake_args
+        if args.ament_cmake_pytest_with_coverage:
+            if args.cmake_args is None:
+                args.cmake_args = []
+            args.cmake_args.append('-DAMENT_CMAKE_PYTEST_WITH_COVERAGE=1')
 
         return await extension.build(
             environment_callback=add_app_to_cpp,
