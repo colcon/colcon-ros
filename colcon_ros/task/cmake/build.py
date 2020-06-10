@@ -7,6 +7,7 @@ from colcon_cmake.task.cmake.build import CmakeBuildTask as CmakeBuildTask_
 from colcon_core.environment import create_environment_scripts
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
+from colcon_core.task import collect_existing_environment_hooks
 from colcon_core.task import TaskExtensionPoint
 from colcon_ros.task import add_app_to_cpp
 from colcon_ros.task.cmake import create_pkg_config_path_environment_hooks
@@ -35,6 +36,12 @@ class CmakeBuildTask(TaskExtensionPoint):
 
         additional_hooks = create_pkg_config_path_environment_hooks(
             Path(args.install_base), self.context.pkg.name)
+
+        # register additional custom hooks
+        custom_hooks_path = Path(args.install_base) / \
+            'share' / self.context.pkg.name / 'env_hook'
+        additional_hooks += collect_existing_environment_hooks(
+            custom_hooks_path)
 
         create_environment_scripts(
             self.context.pkg, args, additional_hooks=additional_hooks)
