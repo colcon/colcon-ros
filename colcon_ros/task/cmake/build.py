@@ -31,7 +31,8 @@ class CmakeBuildTask(TaskExtensionPoint):
         extension = CmakeBuildTask_()
         extension.set_context(context=self.context)
 
-        rc = await extension.build(environment_callback=add_app_to_cpp)
+        rc = await extension.build(
+            skip_hook_creation=True, environment_callback=add_app_to_cpp)
 
         additional_hooks = create_pkg_config_path_environment_hooks(
             Path(args.install_base), self.context.pkg.name)
