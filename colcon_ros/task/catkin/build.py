@@ -2,6 +2,7 @@
 # Licensed under the Apache License, Version 2.0
 
 from collections import OrderedDict
+from contextlib import suppress
 import os
 from pathlib import Path
 
@@ -94,7 +95,8 @@ class CatkinBuildTask(TaskExtensionPoint):
             file_extension_hooks = sorted(custom_hooks_path.glob(
                 '*.{file_extension}'.format_map(locals())))
             if file_extension_hooks:
-                try:
+                # since not all shell extensions might implement this
+                with suppress(NotImplementedError):
                     # try to set CATKIN_ENV_HOOK_WORKSPACE explicitly before
                     # sourcing these hooks
                     additional_hooks.append(
@@ -103,9 +105,6 @@ class CatkinBuildTask(TaskExtensionPoint):
                             Path(args.install_base), self.context.pkg.name,
                             'CATKIN_ENV_HOOK_WORKSPACE',
                             ''))
-                except NotImplementedError:
-                    # since not all shell extensions might implement this
-                    pass
                 additional_hooks += file_extension_hooks
 
         create_environment_scripts(
