@@ -58,6 +58,8 @@ class CatkinBuildTask(TaskExtensionPoint):
             args.cmake_args.append(
                 '-DCATKIN_TEST_RESULTS_DIR=' +
                 os.path.dirname(args.test_result_base))
+        if args.symlink_install:
+            args.cmake_args.append('-DCATKIN_SYMLINK_INSTALL=ON')
         if args.catkin_cmake_args:
             args.cmake_args += args.catkin_cmake_args
 
