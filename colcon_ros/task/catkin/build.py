@@ -34,7 +34,7 @@ class CatkinBuildTask(TaskExtensionPoint):
             'Arguments matching other options must be prefixed by a space')
         parser.add_argument(
             '--catkin-skip-building-tests',
-            action='store_true',
+            action='store_false',
             help="By default the 'tests' target of 'catkin' packages is "
             "invoked. If running 'colcon test' later isn't intended this can "
             'be skipped')
