@@ -6,6 +6,7 @@ from contextlib import suppress
 import os
 from pathlib import Path
 
+from colcon_cmake.task.cmake import has_target
 from colcon_cmake.task.cmake.build import CmakeBuildTask
 from colcon_core.environment import create_environment_scripts
 from colcon_core.logging import colcon_logger
@@ -76,38 +77,43 @@ class CatkinBuildTask(TaskExtensionPoint):
 
         # for catkin packages add additional hooks after the package has
         # been built and installed depending on the installed files
-        additional_hooks = create_environment_hook(
-            'ros_package_path', Path(args.install_base), self.context.pkg.name,
-            'ROS_PACKAGE_PATH', 'share', mode='prepend')
-        additional_hooks += create_pythonpath_environment_hook(
-            args.build_base, Path(args.install_base), self.context.pkg.name)
-        additional_hooks += create_pkg_config_path_environment_hooks(
-            Path(args.install_base), self.context.pkg.name)
+        # only if the package has an install target
+        additional_hooks = []
+        if await has_target(args.build_base, 'install'):
+            additional_hooks += create_environment_hook(
+                'ros_package_path', Path(args.install_base),
+                self.context.pkg.name, 'ROS_PACKAGE_PATH', 'share',
+                mode='prepend')
+            additional_hooks += create_pythonpath_environment_hook(
+                args.build_base, Path(args.install_base),
+                self.context.pkg.name)
+            additional_hooks += create_pkg_config_path_environment_hooks(
+                Path(args.install_base), self.context.pkg.name)
 
-        # register hooks created via catkin_add_env_hooks
-        shell_extensions = get_shell_extensions()
-        file_extensions = OrderedDict()
-        for shell_extensions_same_prio in shell_extensions.values():
-            for shell_extension in shell_extensions_same_prio.values():
-                for file_extension in shell_extension.get_file_extensions():
-                    file_extensions[file_extension] = shell_extension
-        custom_hooks_path = Path(args.install_base) / \
-            'share' / self.context.pkg.name / 'catkin_env_hook'
-        for file_extension, shell_extension in file_extensions.items():
-            file_extension_hooks = sorted(custom_hooks_path.glob(
-                '*.{file_extension}'.format_map(locals())))
-            if file_extension_hooks:
-                # since not all shell extensions might implement this
-                with suppress(NotImplementedError):
-                    # try to set CATKIN_ENV_HOOK_WORKSPACE explicitly before
-                    # sourcing these hooks
-                    additional_hooks.append(
-                        shell_extension.create_hook_set_value(
-                            'catkin_env_hook_workspace',
-                            Path(args.install_base), self.context.pkg.name,
-                            'CATKIN_ENV_HOOK_WORKSPACE',
-                            ''))
-                additional_hooks += file_extension_hooks
+            # register hooks created via catkin_add_env_hooks
+            shell_extensions = get_shell_extensions()
+            file_extensions = OrderedDict()
+            for shell_extensions_same_prio in shell_extensions.values():
+                for shell_extension in shell_extensions_same_prio.values():
+                    for file_ext in shell_extension.get_file_extensions():
+                        file_extensions[file_ext] = shell_extension
+            custom_hooks_path = Path(args.install_base) / \
+                'share' / self.context.pkg.name / 'catkin_env_hook'
+            for file_extension, shell_extension in file_extensions.items():
+                file_extension_hooks = sorted(custom_hooks_path.glob(
+                    '*.{file_extension}'.format_map(locals())))
+                if file_extension_hooks:
+                    # since not all shell extensions might implement this
+                    with suppress(NotImplementedError):
+                        # try to set CATKIN_ENV_HOOK_WORKSPACE explicitly
+                        # before sourcing these hooks
+                        additional_hooks.append(
+                            shell_extension.create_hook_set_value(
+                                'catkin_env_hook_workspace',
+                                Path(args.install_base), self.context.pkg.name,
+                                'CATKIN_ENV_HOOK_WORKSPACE',
+                                ''))
+                    additional_hooks += file_extension_hooks
 
         create_environment_scripts(
             self.context.pkg, args, additional_hooks=additional_hooks)

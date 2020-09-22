@@ -3,7 +3,9 @@
 
 import os
 
+from colcon_cmake.task.cmake import has_target
 from colcon_cmake.task.cmake.build import CmakeBuildTask
+from colcon_core.environment import create_environment_scripts
 from colcon_core.logging import colcon_logger
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.shell import get_shell_extensions
@@ -37,18 +39,6 @@ class AmentCmakeBuildTask(TaskExtensionPoint):
         extension = CmakeBuildTask()
         extension.set_context(context=self.context)
 
-        # add a hook for each available shell
-        additional_hooks = []
-        shell_extensions = get_shell_extensions()
-        file_extensions = []
-        for shell_extensions_same_prio in shell_extensions.values():
-            for shell_extension in shell_extensions_same_prio.values():
-                file_extensions += shell_extension.get_file_extensions()
-        for file_extension in sorted(file_extensions):
-            additional_hooks.append(
-                'share/{self.context.pkg.name}/local_setup.{file_extension}'
-                .format_map(locals()))
-
         # additional arguments
         if args.test_result_base:
             if args.cmake_args is None:
@@ -66,6 +56,25 @@ class AmentCmakeBuildTask(TaskExtensionPoint):
                 args.cmake_args = []
             args.cmake_args += args.ament_cmake_args
 
-        return await extension.build(
-            environment_callback=add_app_to_cpp,
-            additional_hooks=additional_hooks)
+        rc = await extension.build(
+            skip_hook_creation=False,
+            environment_callback=add_app_to_cpp)
+
+        # add a hook for each available shell
+        # only if the package has an install target
+        additional_hooks = []
+        if await has_target(args.build_base, 'install'):
+            shell_extensions = get_shell_extensions()
+            file_extensions = []
+            for shell_extensions_same_prio in shell_extensions.values():
+                for shell_extension in shell_extensions_same_prio.values():
+                    file_extensions += shell_extension.get_file_extensions()
+            for ext in sorted(file_extensions):
+                additional_hooks.append(
+                    'share/{self.context.pkg.name}/local_setup.{ext}'
+                    .format_map(locals()))
+
+        create_environment_scripts(
+            self.context.pkg, args, additional_hooks=additional_hooks)
+
+        return rc

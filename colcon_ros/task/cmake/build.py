@@ -3,6 +3,7 @@
 
 from pathlib import Path
 
+from colcon_cmake.task.cmake import has_target
 from colcon_cmake.task.cmake.build import CmakeBuildTask as CmakeBuildTask_
 from colcon_core.environment import create_environment_scripts
 from colcon_core.logging import colcon_logger
@@ -34,8 +35,10 @@ class CmakeBuildTask(TaskExtensionPoint):
         rc = await extension.build(
             skip_hook_creation=True, environment_callback=add_app_to_cpp)
 
-        additional_hooks = create_pkg_config_path_environment_hooks(
-            Path(args.install_base), self.context.pkg.name)
+        additional_hooks = []
+        if await has_target(args.build_base, 'install'):
+            additional_hooks += create_pkg_config_path_environment_hooks(
+                Path(args.install_base), self.context.pkg.name)
 
         create_environment_scripts(
             self.context.pkg, args, additional_hooks=additional_hooks)
