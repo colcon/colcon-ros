@@ -60,10 +60,18 @@ class AmentCmakeBuildTask(TaskExtensionPoint):
             skip_hook_creation=False,
             environment_callback=add_app_to_cpp)
 
+        # if the build has failed getting targets might not be possible
+        try:
+            has_install_target = await has_target(args.build_base, 'install')
+        except Exception:
+            if not rc:
+                raise
+            has_install_target = False
+
         # add a hook for each available shell
         # only if the package has an install target
         additional_hooks = []
-        if await has_target(args.build_base, 'install'):
+        if has_install_target:
             shell_extensions = get_shell_extensions()
             file_extensions = []
             for shell_extensions_same_prio in shell_extensions.values():

@@ -75,11 +75,19 @@ class CatkinBuildTask(TaskExtensionPoint):
         rc = await extension.build(
             skip_hook_creation=True, additional_targets=additional_targets)
 
+        # if the build has failed getting targets might not be possible
+        try:
+            has_install_target = await has_target(args.build_base, 'install')
+        except Exception:
+            if not rc:
+                raise
+            has_install_target = False
+
         # for catkin packages add additional hooks after the package has
         # been built and installed depending on the installed files
         # only if the package has an install target
         additional_hooks = []
-        if await has_target(args.build_base, 'install'):
+        if has_install_target:
             additional_hooks += create_environment_hook(
                 'ros_package_path', Path(args.install_base),
                 self.context.pkg.name, 'ROS_PACKAGE_PATH', 'share',

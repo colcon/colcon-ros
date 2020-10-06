@@ -35,8 +35,16 @@ class CmakeBuildTask(TaskExtensionPoint):
         rc = await extension.build(
             skip_hook_creation=True, environment_callback=add_app_to_cpp)
 
+        # if the build has failed getting targets might not be possible
+        try:
+            has_install_target = await has_target(args.build_base, 'install')
+        except Exception:
+            if not rc:
+                raise
+            has_install_target = False
+
         additional_hooks = []
-        if await has_target(args.build_base, 'install'):
+        if has_install_target:
             additional_hooks += create_pkg_config_path_environment_hooks(
                 Path(args.install_base), self.context.pkg.name)
 
