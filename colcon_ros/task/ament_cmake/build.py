@@ -63,7 +63,7 @@ class AmentCmakeBuildTask(TaskExtensionPoint):
         # if the build has failed getting targets might not be possible
         try:
             has_install_target = await has_target(args.build_base, 'install')
-        except Exception:
+        except Exception:  # noqa: B902
             if not rc:
                 raise
             has_install_target = False
