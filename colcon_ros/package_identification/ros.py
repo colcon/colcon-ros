@@ -49,12 +49,6 @@ class RosPackageIdentification(
         if desc.type is not None and desc.type != 'ros':
             return
 
-        # skip paths with an ignore marker file
-        if (desc.path / 'CATKIN_IGNORE').exists():
-            raise IgnoreLocationException()
-        if (desc.path / 'AMENT_IGNORE').exists():
-            raise IgnoreLocationException()
-
         # parse package manifest and get build type
         pkg, build_type = get_package_with_build_type(str(desc.path))
         if not pkg or not build_type:
@@ -63,6 +57,12 @@ class RosPackageIdentification(
                 # ignore location to avoid being identified as a CMake package
                 raise IgnoreLocationException()
             return
+
+        # skip paths with an ignore marker file
+        if build_type.startswith('catkin') and (desc.path / 'CATKIN_IGNORE').exists():
+            raise IgnoreLocationException()
+        if build_type.startswith('ament') and (desc.path / 'AMENT_IGNORE').exists():
+            raise IgnoreLocationException()
 
         # for Python build types ensure that a setup.py file exists
         if build_type == 'ament_python':
