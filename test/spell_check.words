@@ -19,6 +19,7 @@ dsetuptools
 github
 https
 iterdir
+joinpath
 kislyuk
 linux
 lstrip
@@ -33,6 +34,7 @@ prepend
 pytest
 pythonpath
 relpath
+rosdistro
 rstrip
 rtype
 scspell

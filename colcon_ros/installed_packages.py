@@ -14,6 +14,7 @@ class AmentInstalledPackageFinder(FindInstalledPackagesExtensionPoint):
     """
 
     def find_installed_packages(self, install_base: Path):
+        """Find installed packages in an ament workspace."""
         package_index = install_base.joinpath(
                 'share', 'ament_index', 'resource_index', 'packages')
 
