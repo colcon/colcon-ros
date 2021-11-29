@@ -18,7 +18,7 @@ class AmentInstalledPackageFinder(FindInstalledPackagesExtensionPoint):
         package_index = install_base.joinpath(
                 'share', 'ament_index', 'resource_index', 'packages')
 
-        if not package_index.exists() or not package_index.is_dir():
+        if not package_index.is_dir():
             return None
 
         packages = {}
