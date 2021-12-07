@@ -131,9 +131,9 @@ class RosPackageIdentification(
 
             desc.metadata['get_python_setup_options'] = getter
 
-    def augment_packages(
+    def augment_packages(  # noqa: D102
         self, descs, *, additional_argument_names=None
-    ):  # noqa: D102
+    ):
         # get all parsed ROS package manifests
         global _cached_packages
         pkgs = {}
