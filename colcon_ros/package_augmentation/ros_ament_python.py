@@ -10,7 +10,7 @@ from colcon_python_setup_py.package_identification.python_setup_py \
 
 
 class RosAmentPythonPackageAugmentation(PackageAugmentationExtensionPoint):
-    """Augment ament_python packages with information form setup files."""
+    """Augment ament_python packages with information from setup files."""
 
     # the priority needs to be higher than the extensions augmenting packages
     # using the setup.py/setup.cfg files
