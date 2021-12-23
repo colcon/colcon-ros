@@ -9,12 +9,8 @@ from colcon_core.package_identification import IgnoreLocationException
 from colcon_core.package_identification import logger
 from colcon_core.package_identification \
     import PackageIdentificationExtensionPoint
-from colcon_core.package_identification.python import get_configuration
-from colcon_core.package_identification.python import is_reading_cfg_sufficient
 from colcon_core.plugin_system import satisfies_version
 from colcon_core.plugin_system import SkipExtensionException
-from colcon_python_setup_py.package_identification.python_setup_py \
-    import get_setup_information
 
 
 # mapping paths to tuples containing the ROS package and its build type
@@ -64,15 +60,6 @@ class RosPackageIdentification(
                 raise IgnoreLocationException()
             return
 
-        # for Python build types ensure that a setup.py file exists
-        if build_type == 'ament_python':
-            setup_py = desc.path / 'setup.py'
-            if not setup_py.is_file():
-                logger.error(
-                    "ROS package '{desc.path}' with build type '{build_type}' "
-                    "has no 'setup.py' file" .format_map(locals()))
-                raise IgnoreLocationException()
-
         desc.type = 'ros.{build_type}'.format_map(locals())
 
         # use package name from manifest if not already set
@@ -104,32 +91,6 @@ class RosPackageIdentification(
             if d.evaluated_condition:
                 desc.dependencies['test'].add(DependencyDescriptor(
                     d.name, metadata=_create_metadata(d)))
-
-        # for Python build types ensure that a setup.py file exists
-        if build_type == 'ament_python':
-            setup_cfg = desc.path / 'setup.cfg'
-            for _ in (1, ):
-                # try to get information from setup.cfg file
-                if setup_cfg.is_file():
-                    if is_reading_cfg_sufficient(setup_py):
-                        config = get_configuration(setup_cfg)
-                        name = config.get('metadata', {}).get('name')
-                        if name:
-                            options = config.get('options', {})
-
-                            def getter(env):
-                                nonlocal options
-                                return options
-                            break
-            else:
-                # use information from setup.py file
-
-                def getter(env):  # noqa: F811
-                    nonlocal desc
-                    return get_setup_information(
-                        desc.path / 'setup.py', env=env)
-
-            desc.metadata['get_python_setup_options'] = getter
 
     def augment_packages(  # noqa: D102
         self, descs, *, additional_argument_names=None
