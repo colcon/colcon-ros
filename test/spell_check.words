@@ -13,6 +13,7 @@ dcatkin
 dcmake
 debian
 debinfo
+deps
 descs
 dpkg
 dsetuptools
@@ -44,6 +45,7 @@ stacklevel
 stdeb
 symlink
 sysconfig
+tempfile
 thomas
 todo
 tuples
