@@ -92,6 +92,12 @@ class RosPackageIdentification(
                 desc.dependencies['test'].add(DependencyDescriptor(
                     d.name, metadata=_create_metadata(d)))
 
+        # get any maintainers which list an E-mail address
+        maintainers = [str(m) for m in pkg.maintainers if m.email]
+        if maintainers:
+            desc.metadata.setdefault('maintainers', [])
+            desc.metadata['maintainers'] += maintainers
+
     def augment_packages(  # noqa: D102
         self, descs, *, additional_argument_names=None
     ):
