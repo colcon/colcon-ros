@@ -14,7 +14,8 @@ from colcon_core.task import install
 from colcon_core.task import TaskExtensionPoint
 from colcon_core.task.python import get_data_files_mapping
 from colcon_core.task.python import get_setup_data
-from colcon_core.task.python.build import PythonBuildTask
+from colcon_python_project.task.python.project.build \
+    import PythonProjectBuildTask as PythonBuildTask
 
 logger = colcon_logger.getChild(__name__)
 
