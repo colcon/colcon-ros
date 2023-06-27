@@ -29,8 +29,8 @@ class AmentPythonBuildTask(TaskExtensionPoint):
     async def build(self):  # noqa: D102
         args = self.context.args
         logger.info(
-            "Building ROS package in '{args.path}' with build type "
-            "'ament_python'".format_map(locals()))
+            f"Building ROS package in '{args.path}' with build type "
+            "'ament_python'")
 
         # reuse Python build task with additional logic
         extension = PythonBuildTask()
@@ -70,8 +70,7 @@ class AmentPythonBuildTask(TaskExtensionPoint):
                 installs_package_index = True
             elif (
                 source == 'package.xml' and
-                destination == 'share/{self.context.pkg.name}/package.xml'
-                .format_map(locals())
+                destination == f'share/{self.context.pkg.name}/package.xml'
             ):
                 installs_package_manifest = True
 
@@ -80,26 +79,24 @@ class AmentPythonBuildTask(TaskExtensionPoint):
         if not installs_package_index:
             # TODO remove magic helper in the future
             logger.warn(
-                "Package '{self.context.pkg.name}' doesn't explicitly install "
-                'a marker in the package index (colcon-ros currently does it '
-                'implicitly but that fallback will be removed in the future)'
-                .format_map(locals()))
+                f"Package '{self.context.pkg.name}' doesn't explicitly "
+                'install a marker in the package index (colcon-ros currently '
+                'does it implicitly but that fallback will be removed in the '
+                'future)')
             # create package marker in ament resource index
             create_file(
                 args,
                 'share/ament_index/resource_index/packages/'
-                '{self.context.pkg.name}'.format_map(locals()))
+                f'{self.context.pkg.name}')
         if not installs_package_manifest:
             # TODO remove magic helper in the future
             logger.warn(
-                "Package '{self.context.pkg.name}' doesn't explicitly install "
-                "the 'package.xml' file (colcon-ros currently does it "
-                'implicitly but that fallback will be removed in the future)'
-                .format_map(locals()))
+                f"Package '{self.context.pkg.name}' doesn't explicitly "
+                "install the 'package.xml' file (colcon-ros currently does it "
+                'implicitly but that fallback will be removed in the future)')
             # copy / symlink package manifest
             install(
                 args, 'package.xml',
-                'share/{self.context.pkg.name}/package.xml'
-                .format_map(locals()))
+                f'share/{self.context.pkg.name}/package.xml')
 
         return await extension.build(additional_hooks=additional_hooks)

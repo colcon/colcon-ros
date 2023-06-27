@@ -32,9 +32,8 @@ class AmentPrefixPath(PrefixPathExtensionPoint):
             if not os.path.exists(path):
                 if path not in _get_ament_prefix_path_warnings:
                     logger.warning(
-                        "The path '{path}' in the environment variable "
-                        "AMENT_PREFIX_PATH doesn't exist"
-                        .format_map(locals()))
+                        f"The path '{path}' in the environment variable "
+                        "AMENT_PREFIX_PATH doesn't exist")
                 _get_ament_prefix_path_warnings.add(path)
                 continue
 
@@ -48,9 +47,9 @@ class AmentPrefixPath(PrefixPathExtensionPoint):
                 if not os.path.exists(marker_file):
                     if path not in _get_ament_prefix_path_warnings:
                         logger.warning(
-                            "The path '{path}' in the environment variable "
+                            f"The path '{path}' in the environment variable "
                             "AMENT_PREFIX_PATH doesn't contain any "
-                            "'local_setup.*' files.".format_map(locals()))
+                            "'local_setup.*' files.")
                         _get_ament_prefix_path_warnings.add(path)
                     continue
                 with open(marker_file, 'r') as h:
@@ -58,9 +57,9 @@ class AmentPrefixPath(PrefixPathExtensionPoint):
                 if install_layout != 'isolated':
                     if path not in _get_ament_prefix_path_warnings:
                         logger.warning(
-                            "The path '{path}' in the environment variable "
+                            f"The path '{path}' in the environment variable "
                             "AMENT_PREFIX_PATH doesn't use the expected "
-                            "install layout 'isolated'.".format_map(locals()))
+                            "install layout 'isolated'.")
                         _get_ament_prefix_path_warnings.add(path)
                     continue
                 path = parent_path

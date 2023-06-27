@@ -25,8 +25,7 @@ class CmakeBuildTask(TaskExtensionPoint):
     async def build(self):  # noqa: D102
         args = self.context.args
         logger.info(
-            "Building ROS package in '{args.path}' with build type 'cmake'"
-            .format_map(locals()))
+            f"Building ROS package in '{args.path}' with build type 'cmake'")
 
         # reuse CMake build task with additional logic
         extension = CmakeBuildTask_()

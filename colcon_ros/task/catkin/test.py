@@ -25,8 +25,7 @@ class CatkinTestTask(TaskExtensionPoint):
     async def test(self):  # noqa: D102
         args = self.context.args
         logger.info(
-            "Testing ROS package in '{args.path}' with build type 'catkin'"
-            .format_map(locals()))
+            f"Testing ROS package in '{args.path}' with build type 'catkin'")
 
         # for catkin packages it is expected that the devel space
         # and not the install space is in the environment for testing

@@ -32,8 +32,8 @@ class AmentCmakeBuildTask(TaskExtensionPoint):
     async def build(self):  # noqa: D102
         args = self.context.args
         logger.info(
-            "Building ROS package in '{args.path}' with build type "
-            "'ament_cmake'".format_map(locals()))
+            f"Building ROS package in '{args.path}' with build type "
+            "'ament_cmake'")
 
         # reuse CMake build task with additional logic
         extension = CmakeBuildTask()
@@ -79,8 +79,7 @@ class AmentCmakeBuildTask(TaskExtensionPoint):
                     file_extensions += shell_extension.get_file_extensions()
             for ext in sorted(file_extensions):
                 additional_hooks.append(
-                    'share/{self.context.pkg.name}/local_setup.{ext}'
-                    .format_map(locals()))
+                    f'share/{self.context.pkg.name}/local_setup.{ext}')
 
         create_environment_scripts(
             self.context.pkg, args, additional_hooks=additional_hooks)

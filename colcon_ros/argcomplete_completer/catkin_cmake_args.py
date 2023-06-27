@@ -46,11 +46,11 @@ def get_catkin_cmake_args_completer_choices():
     # see https://github.com/kislyuk/argcomplete/issues/94
     return \
         [
-            ' -DCATKIN_ENABLE_TESTING={flag}'.format_map(locals())
+            f' -DCATKIN_ENABLE_TESTING={flag}'
             for flag in ('OFF', 'ON')] + \
         [
-            ' -DCATKIN_SKIP_TESTING={flag}'.format_map(locals())
+            f' -DCATKIN_SKIP_TESTING={flag}'
             for flag in ('OFF', 'ON')] + \
         [
-            ' -DSETUPTOOLS_DEB_LAYOUT={flag}'.format_map(locals())
+            f' -DSETUPTOOLS_DEB_LAYOUT={flag}'
             for flag in ('OFF', 'ON')]

@@ -43,8 +43,7 @@ class CatkinBuildTask(TaskExtensionPoint):
     async def build(self):  # noqa: D102
         args = self.context.args
         logger.info(
-            "Building ROS package in '{args.path}' with build type 'catkin'"
-            .format_map(locals()))
+            f"Building ROS package in '{args.path}' with build type 'catkin'")
 
         # reuse CMake build task with additional logic
         extension = CmakeBuildTask()
@@ -109,7 +108,7 @@ class CatkinBuildTask(TaskExtensionPoint):
                 'share' / self.context.pkg.name / 'catkin_env_hook'
             for file_extension, shell_extension in file_extensions.items():
                 file_extension_hooks = sorted(custom_hooks_path.glob(
-                    '*.{file_extension}'.format_map(locals())))
+                    f'*.{file_extension}'))
                 if file_extension_hooks:
                     # since not all shell extensions might implement this
                     with suppress(NotImplementedError):
