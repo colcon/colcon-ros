@@ -67,6 +67,16 @@ class RosPackageIdentification(
         if desc.name is None:
             desc.name = pkg.name
 
+    def augment_package(  # noqa: D102
+        self, desc, *, additional_argument_names=None
+    ):
+        if not desc.type.startswith('ros.'):
+            return
+
+        pkg, build_type = get_package_with_build_type(str(desc.path))
+        if not pkg:
+            return
+
         desc.metadata['version'] = pkg.version
 
         # get dependencies
@@ -101,6 +111,9 @@ class RosPackageIdentification(
     def augment_packages(  # noqa: D102
         self, descs, *, additional_argument_names=None
     ):
+        super().augment_packages(
+            descs, additional_argument_names=additional_argument_names)
+
         # get all parsed ROS package manifests
         global _cached_packages
         pkgs = {}
