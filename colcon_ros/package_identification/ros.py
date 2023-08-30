@@ -111,6 +111,10 @@ class RosPackageIdentification(
             if pkg:
                 pkgs[pkg] = desc
 
+        metadata = {
+            'origin': 'ros',
+        }
+
         # resolve group members and add them to the descriptor dependencies
         for pkg, desc in pkgs.items():
             for group_depend in pkg.group_depends:
@@ -119,8 +123,10 @@ class RosPackageIdentification(
                     continue
                 group_depend.extract_group_members(pkgs)
                 for name in group_depend.members:
-                    desc.dependencies['build'].add(DependencyDescriptor(name))
-                    desc.dependencies['run'].add(DependencyDescriptor(name))
+                    desc.dependencies['build'].add(DependencyDescriptor(
+                        name, metadata=metadata))
+                    desc.dependencies['run'].add(DependencyDescriptor(
+                        name, metadata=metadata))
 
 
 def get_package_with_build_type(path: str):
@@ -174,7 +180,9 @@ def _get_build_type(pkg, path):
 
 
 def _create_metadata(dependency):
-    metadata = {}
+    metadata = {
+        'origin': 'ros',
+    }
     attributes = (
         'version_lte',
         'version_lt',
