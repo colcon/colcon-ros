@@ -8,9 +8,9 @@ Author: Dirk Thomas <web@dirk-thomas.net>
 
 --- setup.cfg	2018-06-28 13:13:13.000000000 -0700
 +++ setup.cfg.patched	2018-06-28 13:13:13.000000000 -0700
-@@ -26,7 +26,11 @@
- 
+@@ -27,7 +27,11 @@
  [options]
+ python_requires = >=3.6
  install_requires = 
 -	catkin_pkg>=0.4.14
 +	# to avoid conflicts with ROS 1 this Debian package only depends on

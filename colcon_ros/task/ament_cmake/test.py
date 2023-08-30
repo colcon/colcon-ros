@@ -20,8 +20,8 @@ class AmentCmakeTestTask(TaskExtensionPoint):
     async def test(self):  # noqa: D102
         args = self.context.args
         logger.info(
-            "Testing ROS package in '{args.path}' with build type "
-            "'ament_cmake'".format_map(locals()))
+            f"Testing ROS package in '{args.path}' with build type "
+            "'ament_cmake'")
 
         # reuse CMake test task
         extension = CmakeTestTask()

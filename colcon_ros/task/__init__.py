@@ -67,8 +67,7 @@ def extend_cpp_with_app(args):
             if existing:
                 existing = ';' + existing
             args.cmake_args[i] = \
-                '-DCMAKE_PREFIX_PATH={ament_prefix_path}{existing}' \
-                .format_map(locals())
+                f'-DCMAKE_PREFIX_PATH={ament_prefix_path}{existing}'
             break
         else:
             # otherwise extend the environment variable
@@ -77,5 +76,4 @@ def extend_cpp_with_app(args):
                 existing = ';' + existing.replace(
                     os.pathsep, ';')
             args.cmake_args.append(
-                '-DCMAKE_PREFIX_PATH={ament_prefix_path}{existing}'
-                .format_map(locals()))
+                f'-DCMAKE_PREFIX_PATH={ament_prefix_path}{existing}')

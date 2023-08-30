@@ -20,8 +20,7 @@ class CmakeTestTask(TaskExtensionPoint):
     async def test(self):  # noqa: D102
         args = self.context.args
         logger.info(
-            "Testing ROS package in '{args.path}' with build type 'cmake'"
-            .format_map(locals()))
+            f"Testing ROS package in '{args.path}' with build type 'cmake'")
 
         # reuse CMake test task
         extension = CmakeTestTask_()

@@ -60,7 +60,7 @@ class RosPackageIdentification(
                 raise IgnoreLocationException()
             return
 
-        desc.type = 'ros.{build_type}'.format_map(locals())
+        desc.type = f'ros.{build_type}'
 
         # use package name from manifest if not already set
         # e.g. from external configuration
@@ -128,7 +128,7 @@ def get_package_with_build_type(path: str):
     global _cached_packages
     if path not in _cached_packages:
         pkg = _get_package(path)
-        build_type = _get_build_type(pkg) if pkg else None
+        build_type = _get_build_type(pkg, path) if pkg else None
         _cached_packages[path] = (pkg, build_type)
     return _cached_packages[path]
 
@@ -148,30 +148,28 @@ def _get_package(path: str):
     except (AssertionError, InvalidPackage) as e:  # noqa: F841
         if has_ros_schema_reference(path):
             logger.debug(
-                "Found ROS schema reference in package manifest in '{path}'"
-                .format_map(locals()))
+                f"Found ROS schema reference in package manifest in '{path}'")
             logger.warn(
-                "Failed to parse ROS package manifest in '{path}': {e}"
-                .format_map(locals()))
+                f"Failed to parse ROS package manifest in '{path}': {e}")
         else:
             logger.debug(
                 'Failed to parse potential ROS package manifest in'
-                "'{path}': {e}".format_map(locals()))
+                f"'{path}': {e}")
         return None
 
     pkg.evaluate_conditions(os.environ)
     return pkg
 
 
-def _get_build_type(pkg):
+def _get_build_type(pkg, path):
     """Get the build type of the ROS package."""
     from catkin_pkg.package import InvalidPackage
     try:
         return pkg.get_build_type()
     except InvalidPackage:
         logger.warning(
-            "ROS package '{pkg.name}' in '{path}' has more than one "
-            'build type'.format_map(locals()))
+            f"ROS package '{pkg.name}' in '{path}' has more than one "
+            'build type')
         return None
 
 

@@ -27,7 +27,7 @@ def create_pythonpath_environment_hook(build_base, install_base, pkg_name):
     # prepend Python specific path to PYTHONPATH if it exists
     if rel_python_path:
         abs_python_path = install_base / rel_python_path
-        logger.log(1, "checking '%s'" % abs_python_path)
+        logger.log(1, f"checking '{abs_python_path}'")
         if abs_python_path.exists():
             hooks += create_environment_hook(
                 'catkin_pythonpath', install_base, pkg_name,

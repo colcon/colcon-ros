@@ -36,9 +36,8 @@ class CmakePrefixPath(PrefixPathExtensionPoint):
             if not os.path.exists(path):
                 if path not in _get_cmake_prefix_path_warnings:
                     logger.warning(
-                        "The path '{path}' in the environment variable "
-                        "CMAKE_PREFIX_PATH doesn't exist"
-                        .format_map(locals()))
+                        f"The path '{path}' in the environment variable "
+                        "CMAKE_PREFIX_PATH doesn't exist")
                     _get_cmake_prefix_path_warnings.add(path)
                 continue
             if not os.path.exists(os.path.join(path, '.catkin')):
@@ -53,11 +52,10 @@ class CmakePrefixPath(PrefixPathExtensionPoint):
                 if not os.path.exists(marker_file):
                     if path not in _get_cmake_prefix_path_warnings:
                         logger.warning(
-                            "The path '{path}' in the environment variable "
+                            f"The path '{path}' in the environment variable "
                             'CMAKE_PREFIX_PATH seems to be a catkin workspace '
                             "but it doesn't contain any 'local_setup.*' files."
-                            ' Maybe the catkin version is not up-to-date?'
-                            .format_map(locals()))
+                            ' Maybe the catkin version is not up-to-date?')
                         _get_cmake_prefix_path_warnings.add(path)
                     continue
                 with open(marker_file, 'r') as h:
@@ -65,9 +63,9 @@ class CmakePrefixPath(PrefixPathExtensionPoint):
                 if install_layout != 'isolated':
                     if path not in _get_cmake_prefix_path_warnings:
                         logger.warning(
-                            "The path '{path}' in the environment variable "
+                            f"The path '{path}' in the environment variable "
                             "CMAKE_PREFIX_PATH doesn't use the expected "
-                            "install layout 'isolated'.".format_map(locals()))
+                            "install layout 'isolated'.")
                         _get_cmake_prefix_path_warnings.add(path)
                     continue
                 path = parent_path
