@@ -22,6 +22,7 @@ https
 iterdir
 joinpath
 kislyuk
+linter
 linux
 lstrip
 multiarch
@@ -32,6 +33,7 @@ pkgconfig
 pkgs
 plugin
 prepend
+pydocstyle
 pytest
 pythonpath
 relpath
