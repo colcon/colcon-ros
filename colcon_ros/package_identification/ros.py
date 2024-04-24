@@ -176,7 +176,11 @@ def _get_package(path: str):
                 f"'{path}': {e}")
         return None
 
-    pkg.evaluate_conditions(os.environ)
+    condition_context = {
+        **os.environ,
+        'DISABLE_GROUPS_WORKAROUND': '1',
+    }
+    pkg.evaluate_conditions(condition_context)
     return pkg
 
 
