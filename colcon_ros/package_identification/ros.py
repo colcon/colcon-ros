@@ -73,40 +73,11 @@ class RosPackageIdentification(
         if not desc.type.startswith('ros.'):
             return
 
-        pkg, build_type = get_package_with_build_type(str(desc.path))
+        pkg, _ = get_package_with_build_type(str(desc.path))
         if not pkg:
             return
 
-        desc.metadata['version'] = pkg.version
-
-        # get dependencies
-        for d in pkg.build_depends + pkg.buildtool_depends:
-            assert d.evaluated_condition is not None
-            if d.evaluated_condition:
-                desc.dependencies['build'].add(DependencyDescriptor(
-                    d.name, metadata=_create_metadata(d)))
-
-        for d in (
-            pkg.build_export_depends +
-            pkg.buildtool_export_depends +
-            pkg.exec_depends
-        ):
-            assert d.evaluated_condition is not None
-            if d.evaluated_condition:
-                desc.dependencies['run'].add(DependencyDescriptor(
-                    d.name, metadata=_create_metadata(d)))
-
-        for d in pkg.test_depends:
-            assert d.evaluated_condition is not None
-            if d.evaluated_condition:
-                desc.dependencies['test'].add(DependencyDescriptor(
-                    d.name, metadata=_create_metadata(d)))
-
-        # get any maintainers which list an E-mail address
-        maintainers = [str(m) for m in pkg.maintainers if m.email]
-        if maintainers:
-            desc.metadata.setdefault('maintainers', [])
-            desc.metadata['maintainers'] += maintainers
+        augment_package(desc, pkg)
 
     def augment_packages(  # noqa: D102
         self, descs, *, additional_argument_names=None
@@ -124,22 +95,68 @@ class RosPackageIdentification(
             if pkg:
                 pkgs[pkg] = desc
 
-        metadata = {
-            'origin': 'ros',
-        }
+        add_group_dependencies(pkgs)
 
-        # resolve group members and add them to the descriptor dependencies
-        for pkg, desc in pkgs.items():
-            for group_depend in pkg.group_depends:
-                assert group_depend.evaluated_condition is not None
-                if not group_depend.evaluated_condition:
-                    continue
-                group_depend.extract_group_members(pkgs)
-                for name in group_depend.members:
-                    desc.dependencies['build'].add(DependencyDescriptor(
-                        name, metadata=metadata))
-                    desc.dependencies['run'].add(DependencyDescriptor(
-                        name, metadata=metadata))
+
+def augment_package(desc, pkg):
+    """
+    Augment a package descriptor based on data from a parsed package manifest.
+
+    :param desc: The package descriptor
+    :param pkg: The parsed package manifest
+    """
+    desc.metadata['version'] = pkg.version
+
+    # get dependencies
+    desc.dependencies['build'].update(
+        _enumerate_dependency_descriptors(
+            pkg.build_depends +
+            pkg.buildtool_depends
+        ))
+
+    desc.dependencies['run'].update(
+        _enumerate_dependency_descriptors(
+            pkg.build_export_depends +
+            pkg.buildtool_export_depends +
+            pkg.exec_depends
+        ))
+
+    desc.dependencies['test'].update(
+        _enumerate_dependency_descriptors(
+            pkg.test_depends
+        ))
+
+    # get any maintainers which list an E-mail address
+    maintainers = [str(m) for m in pkg.maintainers if m.email]
+    if maintainers:
+        desc.metadata.setdefault('maintainers', [])
+        desc.metadata['maintainers'] += maintainers
+
+
+def add_group_dependencies(pkgs):
+    """
+    Add appropriate dependencies based on group membership.
+
+    :param dict pkgs: A mapping of parsed package manifests
+      to associated package descriptors
+    :
+    """
+    metadata = {
+        'origin': 'ros',
+    }
+
+    # resolve group members and add them to the descriptor dependencies
+    for pkg, desc in pkgs.items():
+        for group_depend in pkg.group_depends:
+            assert group_depend.evaluated_condition is not None
+            if not group_depend.evaluated_condition:
+                continue
+            group_depend.extract_group_members(pkgs)
+            for name in group_depend.members:
+                desc.dependencies['build'].add(DependencyDescriptor(
+                    name, metadata=metadata))
+                desc.dependencies['run'].add(DependencyDescriptor(
+                    name, metadata=metadata))
 
 
 def get_package_with_build_type(path: str):
@@ -190,6 +207,15 @@ def _get_build_type(pkg, path):
             f"ROS package '{pkg.name}' in '{path}' has more than one "
             'build type')
         return None
+
+
+def _enumerate_dependency_descriptors(dependencies):
+    for dependency in dependencies:
+        assert dependency.evaluated_condition is not None
+        if not dependency.evaluated_condition:
+            continue
+        yield DependencyDescriptor(
+            dependency.name, metadata=_create_metadata(dependency))
 
 
 def _create_metadata(dependency):
