@@ -17,6 +17,7 @@ deps
 descs
 dpkg
 dsetuptools
+foobar
 github
 https
 iterdir
