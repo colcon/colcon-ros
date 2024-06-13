@@ -54,8 +54,7 @@ def test_identify():
 
         augmentation_extension.augment_packages([desc])
         assert desc.metadata['version'] == '0.0.0'
-        # TODO: This is a behavior deviation from colcon-core
-        # assert set(desc.dependencies.keys()) == {'build', 'run', 'test'}
+        assert set(desc.dependencies.keys()) == {'build', 'run', 'test'}
         assert not desc.dependencies['build']
         assert not desc.dependencies['run']
         assert not desc.dependencies['test']
