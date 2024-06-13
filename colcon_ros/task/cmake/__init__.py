@@ -44,7 +44,7 @@ def get_multiarch():
     if _multiarch is None:
         try:
             output = subprocess.check_output(['gcc', '-print-multiarch'])
-        except subprocess.CalledProcessError:
+        except (FileNotFoundError, subprocess.CalledProcessError):
             pass
         else:
             _multiarch = output.decode().rstrip()
@@ -52,7 +52,7 @@ def get_multiarch():
             try:
                 output = subprocess.check_output(
                     ['dpkg-architecture', '-qDEB_HOST_MULTIARCH'])
-            except subprocess.CalledProcessError:
+            except (FileNotFoundError, subprocess.CalledProcessError):
                 pass
             else:
                 _multiarch = output.decode().rstrip()
