@@ -46,14 +46,12 @@ class RosAmentPythonPackageAugmentation(PackageAugmentationExtensionPoint):
                         options = config.get('options', {})
 
                         def getter(env):
-                            nonlocal options
                             return options
                         break
         else:
             # use information from setup.py file
 
             def getter(env):  # noqa: F811
-                nonlocal desc
                 return get_setup_information(
                     desc.path / 'setup.py', env=env)
 

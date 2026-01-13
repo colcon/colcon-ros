@@ -28,7 +28,6 @@ class CmakePrefixPath(PrefixPathExtensionPoint):
             PrefixPathExtensionPoint.EXTENSION_POINT_VERSION, '^1.0')
 
     def extend_prefix_path(self, paths):  # noqa: D102
-        global _get_cmake_prefix_path_warnings
         cmake_prefix_path = os.environ.get('CMAKE_PREFIX_PATH', '')
         for path in cmake_prefix_path.split(os.pathsep):
             if not path:

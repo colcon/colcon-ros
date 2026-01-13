@@ -86,7 +86,6 @@ class RosPackageIdentification(
             descs, additional_argument_names=additional_argument_names)
 
         # get all parsed ROS package manifests
-        global _cached_packages
         pkgs = {}
         for desc in descs:
             if str(desc.path) not in _cached_packages:
@@ -161,7 +160,6 @@ def add_group_dependencies(pkgs):
 
 def get_package_with_build_type(path: str):
     """Get the ROS package and its build type for the given path."""
-    global _cached_packages
     if path not in _cached_packages:
         pkg = _get_package(path)
         build_type = _get_build_type(pkg, path) if pkg else None
