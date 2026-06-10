@@ -20,7 +20,9 @@ dsetuptools
 foobar
 github
 https
+isdigit
 iterdir
+itertools
 joinpath
 kislyuk
 linter
@@ -48,8 +50,9 @@ stacklevel
 stdeb
 symlink
 sysconfig
-tempfile
+takewhile
 thomas
+tmpdir
 todo
 tuples
 unittest
